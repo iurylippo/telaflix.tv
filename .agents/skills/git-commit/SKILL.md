@@ -327,7 +327,7 @@ Default commit grouping:
 - Use one commit containing all intentional changes for the Jira task, including related workflow, documentation, and agent/config updates.
 - Do not ask the user to choose between one commit and split commits unless they explicitly request split commits or unrelated changes are present.
 
-Before running `git add`, `git commit`, `git push`, or archiving workflow state, ask for explicit approval using:
+Before archiving workflow state, resetting workflow state, running `git add`, `git commit`, `git push`, or updating Jira final status/comment, ask for explicit approval using:
 
 ```text
 Finalization Approval Required
@@ -363,7 +363,19 @@ Workflow archive:
 Approve commit and push to `{remote}/{branch}`?
 ```
 
-If the user approves, the finalizer may stage all intended files in one commit, commit, push, add/update Jira, archive workflow, and reset `.agents/workflow/current.md`. If the user does not approve, stop without changing git state.
+If the user approves, the finalizer must archive workflow and reset `.agents/workflow/current.md` before staging, then stage all intended files plus the workflow archive/reset in one commit, commit, push, and add/update Jira. If the user does not approve, stop without changing git state or workflow state.
+
+Mandatory finalization order after approval:
+
+1. Archive `.agents/workflow/current.md` to `.agents/workflow/archive/{JIRA_ID}-{slug}.md`.
+2. Reset `.agents/workflow/current.md` to the base workflow template.
+3. Stage intended task files, docs, workflow archive, and reset workflow file.
+4. Inspect `git diff --cached` and confirm archive/reset are staged.
+5. Commit with the approved message.
+6. Push to the approved remote/branch.
+7. Add/update Jira with final summary.
+
+Do not archive/reset after push; doing so leaves uncommitted workflow changes after finalization.
 
 ## Output Format
 
@@ -403,7 +415,7 @@ Finalization Result:
 - Do not ask for finalization approval while PRD/Design Doc open questions or PRD acceptance criteria are stale for completed work.
 - Do not create a branch.
 - Do not open a PR.
-- Do not modify source files. During approved finalization, workflow archive/reset files may be modified.
+- Do not modify source files. During approved finalization, workflow archive/reset files may be modified before staging and must be included in the final commit.
 - Do not include secrets, tokens, `.env` values, or credentials.
 - Do not invent test results.
 - Do not invent Jira links.

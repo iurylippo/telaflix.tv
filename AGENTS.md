@@ -278,8 +278,8 @@ It must:
 - include Jira ID
 - include docs links
 - include tests/lint status
-- when finalization is requested, show branch/upstream/push target/files/commit message and ask for explicit approval before staging, committing, pushing, Jira final comment, or workflow archive
-- after explicit approval, stage only intended files, commit, push to the approved target, add/update Jira with the final summary, archive workflow, and reset `.agents/workflow/current.md`
+- when finalization is requested, show branch/upstream/push target/files/commit message and ask for explicit approval before archiving workflow, resetting workflow, staging, committing, pushing, or Jira final comment
+- after explicit approval, archive workflow and reset `.agents/workflow/current.md` first, stage intended files including the workflow archive/reset, commit, push to the approved target, and add/update Jira with the final summary
 
 ## Jira-First Workflow
 
@@ -714,6 +714,8 @@ When a task is complete, archive the workflow to:
 
 Then reset `.agents/workflow/current.md`.
 
+During finalization, archive and reset must happen before the final commit is created so both `.agents/workflow/archive/{JIRA_ID}-{slug}.md` and the reset `.agents/workflow/current.md` are included in the commit. Do not archive/reset after push, because that leaves uncommitted workflow changes in the worktree.
+
 ## Jira Update Rules
 
 After completing planning, implementation, testing, or review, update Jira when useful.
@@ -759,16 +761,27 @@ Before showing the final approval gate, it must update final documentation so co
 
 It must not ask for final commit/push approval while PRD/Design Doc open questions or PRD acceptance criteria are stale for completed work.
 
-It must ask for explicit user approval before running `git add`, `git commit`, `git push`, or archiving workflow state.
+It must ask for explicit user approval before archiving workflow state, resetting workflow state, running `git add`, `git commit`, `git push`, or updating Jira final status/comment.
 
 If approved, it may:
 
-- stage all intended files for the Jira task and related workflow/docs/configuration updates in one commit
+- archive `.agents/workflow/current.md` to `.agents/workflow/archive/{JIRA_ID}-{slug}.md`
+- reset `.agents/workflow/current.md`
+- stage all intended files for the Jira task and related workflow/docs/configuration updates, including the workflow archive and reset current workflow, in one commit
 - commit with the approved message
 - push to the approved remote/branch
 - update Jira with final implementation/test/lint summary
-- archive `.agents/workflow/current.md` to `.agents/workflow/archive/{JIRA_ID}-{slug}.md`
-- reset `.agents/workflow/current.md`
+
+Finalization order after approval is mandatory:
+
+1. Archive `.agents/workflow/current.md` to `.agents/workflow/archive/{JIRA_ID}-{slug}.md`.
+2. Reset `.agents/workflow/current.md` to the base workflow template.
+3. Stage intended task files, docs, workflow archive, and reset workflow file.
+4. Commit with the approved message.
+5. Push to the approved remote/branch.
+6. Update Jira with the final summary.
+
+Do not commit/push before archive/reset is staged unless the user explicitly requests a non-final partial commit.
 
 Default finalization behavior is one commit per completed Jira task. Do not ask whether to split commits unless the user explicitly requests split commits or unrelated changes are present.
 

@@ -69,7 +69,7 @@ When explicitly asked to finalize, also:
 4. Add a concise Jira implementation/test summary when possible.
 5. Sync PRD/ADR/Design Doc final status/content before presenting the commit/push approval gate.
 6. Present the final commit/push approval gate.
-7. After approval only, stage intended files, commit, push to the shown branch/remote, archive workflow, and reset `.agents/workflow/current.md`.
+7. After approval only, archive workflow and reset `.agents/workflow/current.md` first, then stage intended files including workflow archive/reset, commit, push to the shown branch/remote, and update Jira.
 
 Default finalization behavior: use a single commit containing all files intentionally changed for the Jira task and its workflow/docs/configuration updates. Do not ask whether to split the work into multiple commits unless the user explicitly requests split commits or the diff contains unrelated changes.
 
@@ -265,7 +265,7 @@ Before presenting the approval block, verify and update final documentation:
 
 Do not archive workflow or ask for commit approval while docs contain stale unchecked acceptance criteria or stale open questions for completed work.
 
-Before staging, committing, pushing, or archiving, output this approval block and stop:
+Before archiving, resetting workflow, staging, committing, pushing, or Jira final update, output this approval block and stop:
 
 ```text
 Finalization Approval Required
@@ -301,19 +301,19 @@ Workflow archive:
 Approve commit and push to `{remote}/{branch}`?
 ```
 
-Only proceed if the user explicitly approves. If the user does not approve, leave files uncommitted and do not archive.
+Only proceed if the user explicitly approves. If the user does not approve, leave files uncommitted and do not archive/reset.
 
 ## Finalization Steps After Approval
 
 1. Re-check `git status`, current branch, upstream, remotes, and recent commits.
-2. Verify final PRD/ADR/Design Doc sync is complete; update docs if needed before staging.
-3. Stage all intended files for the Jira task and related workflow/docs/configuration updates in one commit.
-4. Inspect `git diff --cached`.
-5. Commit with the approved message.
-6. Push to the approved remote/branch.
-7. Add/update Jira with a concise final implementation/test/lint summary when the MCP tools allow it.
-8. Archive `.agents/workflow/current.md` to `.agents/workflow/archive/{JIRA_ID}-{slug}.md`.
-9. Reset `.agents/workflow/current.md` to the base workflow template.
+2. Verify final PRD/ADR/Design Doc sync is complete; update docs if needed before archive/reset.
+3. Archive `.agents/workflow/current.md` to `.agents/workflow/archive/{JIRA_ID}-{slug}.md`.
+4. Reset `.agents/workflow/current.md` to the base workflow template.
+5. Stage all intended files for the Jira task and related workflow/docs/configuration updates, including the workflow archive and reset current workflow, in one commit.
+6. Inspect `git diff --cached` and confirm archive/reset are staged.
+7. Commit with the approved message.
+8. Push to the approved remote/branch.
+9. Add/update Jira with a concise final implementation/test/lint summary when the MCP tools allow it.
 10. Return commit hash, push target, archive path, Jira update status, and any skipped step with reason.
 
 ## Workflow Update Format
@@ -389,11 +389,12 @@ Finalization Result:
 
 - Do not edit implementation files.
 - Do not edit PRD, ADR, or Design Doc files.
-- Do not stage, commit, push, or archive until the user explicitly approves the finalization approval block.
+- Do not archive, reset workflow, stage, commit, push, or update Jira final status/comment until the user explicitly approves the finalization approval block.
 - Do not ask whether to use one commit or split commits; use one commit by default unless the user asks otherwise or unrelated changes are present.
 - Do not present the finalization approval block while PRD/Design Doc open questions or PRD acceptance criteria are stale for completed work.
 - Do not open Pull Requests.
-- Do not archive workflow unless explicitly requested as part of finalization.
+- Do not archive/reset workflow unless explicitly requested as part of finalization.
+- Do not commit/push before workflow archive/reset is staged for the final task commit.
 - Do not invent test results.
 - Do not invent PR URLs.
 - Do not include secrets, tokens, `.env` values, or credentials.
