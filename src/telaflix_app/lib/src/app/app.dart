@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../features/home/presentation/home_screen.dart';
+import '../features/splash/presentation/splash_screen.dart';
 import 'theme/app_theme.dart';
 
 class TelaflixApp extends StatelessWidget {
@@ -11,7 +11,7 @@ class TelaflixApp extends StatelessWidget {
     return MaterialApp(
       title: 'Telaflix.TV',
       theme: AppTheme.light,
-      home: const HomeScreen(),
+      home: const SplashScreen(),
     );
   }
 }
