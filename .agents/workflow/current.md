@@ -1,26 +1,5 @@
 # Workflow State
 
-## Workflow Routing
-
-- Classification: (quick-fix | standard-task | full-workflow)
-- Reason:
-  - Why not quick-fix:
-  - Why not standard-task:
-  - Why full-workflow:
-- Selected Workflow:
-- Next Agent:
-
-## Agent Progress
-
-- [ ] brainstormer
-- [ ] planner
-- [ ] plan-reviewer
-- [ ] implementor
-- [ ] reviewer
-- [ ] tester
-- [ ] linter
-- [ ] commit-message
-
 ## Metadata
 
 - Jira ID:
@@ -43,7 +22,7 @@
 
 ## Affected Projects
 
--
+- `src/`
 
 ## Request
 
@@ -123,16 +102,14 @@
 - [ ] Review completed
 - [ ] Tests run or explicitly skipped with reason
 - [ ] Lint/typecheck run or explicitly skipped with reason
+- [ ] PRD acceptance criteria checked/resolved before finalization
+- [ ] PRD and Design Doc open questions resolved before finalization
 - [ ] Jira commented with implementation/test summary
 - [ ] Commit created after explicit approval
 - [ ] Push completed after explicit approval
 - [ ] Workflow archived
 
 ## Commit Message Draft
-
--
-
-## Pull Request Title Draft
 
 -
 
@@ -147,6 +124,7 @@
 - Push Target:
 - Files To Commit:
 - Commit Message:
+- Documentation Final Sync:
 - Jira Final Comment:
 - Workflow Archive:
 

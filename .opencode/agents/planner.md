@@ -49,6 +49,8 @@ Before planning, classify the request as one of:
 
 You must write the classification to `.agents/workflow/current.md`.
 
+If the user asks the planner to add, change, fix, refactor, or implement app/product behavior, do not bypass the repository workflow just because the code change looks small. Use `standard-task` unless the request is explicitly local-only and purely mechanical.
+
 Use this format:
 
 ```md
@@ -65,6 +67,8 @@ Use this format:
 ### quick-fix
 
 Use `quick-fix` only for trivial, low-risk changes with clear scope.
+
+Do not use `quick-fix` for user-requested features, product behavior changes, UI flow changes, splash/onboarding/navigation changes, bug fixes requiring diagnosis, or refactors that affect runtime behavior. Those are at least `standard-task` even when they touch one file.
 
 Examples:
 
@@ -88,6 +92,8 @@ For `quick-fix`:
 6. Create or update `.agents/workflow/current.md` only if useful.
 7. Create a minimal implementation plan.
 8. Hand off directly to `@implementor`.
+
+If any of these statements would be false because the task is a real feature, bug, refactor, or technical task, reclassify as `standard-task`.
 
 Selected workflow:
 
@@ -121,12 +127,13 @@ Examples:
 For `standard-task`:
 
 1. Use `@brainstormer` when Jira/PRD/workflow setup is missing.
-2. Use Jira for non-trivial work.
-3. Create PRD only for non-trivial product features.
-4. Create ADR only if a long-term technical decision exists.
-5. Create Design Doc only if the task becomes large, risky, or multi-module.
-6. Create a technical plan after the task context is clear.
-7. Hand off to `@implementor` when the plan is ready.
+2. Use Jira for every planner-handled feature, bug, refactor, or technical task.
+3. Create or update a concise PRD for every user-requested product feature, including small UI features.
+4. Create ADR only if a long-term technical decision exists; otherwise record `ADR Required: no` in workflow.
+5. Create Design Doc only if the task becomes large, risky, ambiguous, or multi-module; otherwise record `Design Doc Required: no` in workflow.
+6. Initialize or update `.agents/workflow/current.md` before implementation planning.
+7. Create a technical plan after Jira, PRD when required, and workflow state are complete.
+8. Hand off to `@implementor` when the plan is ready.
 
 Selected workflow:
 
@@ -147,7 +154,7 @@ Classification: standard-task
 Next Agent: @brainstormer
 ```
 
-Planner output when Jira, PRD when required, and workflow state are already complete:
+Planner output when Jira, PRD when required, documentation decisions, and workflow state are already complete:
 
 ```text
 Classification: standard-task
@@ -248,8 +255,8 @@ When `quick-fix` fails:
 
 1. Update `.agents/workflow/current.md`.
 2. Reclassify the task as `standard-task` or `full-workflow`.
-3. If no Jira issue exists and the task is now non-trivial, route to `@brainstormer`.
-4. Create PRD only if the task is now a non-trivial product feature.
+3. If no Jira issue exists and the task is now a real feature, bug, refactor, or technical task, route to `@brainstormer`.
+4. Create or update a PRD if the task is a product feature or behavior change.
 5. Use `@plan-reviewer` if the fix is risky, architectural, or unclear.
 6. Do not continue patching without a new plan.
 
@@ -559,7 +566,8 @@ If PRD status is stale, stop and route to `@brainstormer` or the responsible doc
 - Do not create or update Jira directly; use `@brainstormer` and `.agents/skills/jira-automation/SKILL.md`.
 - Do not run commands.
 - Do not edit files other than `.agents/workflow/current.md`.
-- Do not route trivial fixes through the full workflow.
+- Do not route purely mechanical quick fixes through the full workflow.
+- Do not classify user-requested features, behavior changes, UI flows, runtime bug fixes, or refactors as quick-fix unless the user explicitly requests quick local-only work.
 - Do not skip `@plan-reviewer` for risky or architectural work.
 - Do not claim tests or lint were run.
 - Do not keep retrying failed quick-fixes without reclassification.

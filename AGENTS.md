@@ -92,7 +92,24 @@ Use `.agents/skills/jira-automation.md` whenever the agent needs to:
 
 Jira is the canonical task tracker for this repository.
 
-For every non-trivial feature, bug, refactor, or technical task:
+For every user-requested feature, bug, refactor, or technical task handled by the planner, Jira comes first even when the change is small.
+
+Only skip Jira/PRD/workflow setup when the user explicitly asks for a quick local-only change or when the change is purely mechanical, such as a typo, formatting-only edit, obvious one-line import/lint fix, or documentation copy correction.
+
+Minimum workflow for small but real product/code tasks:
+
+1. Check whether the user provided a Jira ID.
+2. If a Jira ID was provided, read the issue through Jira MCP before planning.
+3. If no Jira ID was provided, search Jira for an existing matching issue.
+4. If no matching issue exists, create a new Jira issue through Jira MCP using `.agents/skills/jira-automation.md`.
+5. Create or update a PRD for the requested behavior, even if the PRD is short.
+6. Decide and record that ADR is not required when there is no long-term technical decision.
+7. Decide and record that Design Doc is not required when the task is small, isolated, and low-risk.
+8. Initialize or update `.agents/workflow/current.md` before planning implementation.
+9. Create a technical plan before implementation.
+10. Run review/test/lint steps as appropriate for the risk and affected code; plan-reviewer is optional for small, clear tasks.
+
+Full workflow for non-trivial, risky, ambiguous, or cross-module work:
 
 1. Check whether the user provided a Jira ID.
 2. If a Jira ID was provided, read the issue through Jira MCP before planning.
@@ -266,7 +283,9 @@ It must:
 
 ## Jira-First Workflow
 
-For every non-trivial task, Jira comes first.
+For every planner-handled feature, bug, refactor, or technical task, Jira comes first.
+
+Small tasks still require the minimum workflow unless the user explicitly requests a quick local-only change. A small feature can skip ADR, Design Doc, and plan-reviewer when those are not justified, but it must not skip Jira, PRD, workflow state, technical plan, implementation notes, tests/lint results, and final Jira/workflow updates.
 
 Task lifecycle:
 
@@ -347,7 +366,9 @@ Every PRD, ADR, Design Doc and workflow archive must include affected projects w
 
 ## PRD Rules
 
-Create a PRD for every non-trivial product feature.
+Create a PRD for every user-requested product feature handled by the planner, including small UI features.
+
+For small, clear features, the PRD may be concise but must still capture problem, goal, scope, acceptance criteria, risks, and open questions.
 
 A PRD describes what must be delivered and why.
 
