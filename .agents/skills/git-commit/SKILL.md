@@ -1,6 +1,6 @@
 ---
 name: git-commit
-description: Generate high-quality Conventional Commit messages, PR titles, and PR descriptions from Jira ID, workflow state, and git diff. Keeps Jira issue IDs in the commit message.
+description: Generate high-quality Conventional Commit messages, PR titles, PR descriptions, and finalization plans from Jira ID, workflow state, and git diff. Keeps Jira issue IDs in the commit message.
 ---
 
 ---
@@ -14,11 +14,11 @@ Use this skill when generating:
 - PR descriptions
 - release-oriented summaries
 - final workflow commit drafts
+- finalization plans for commit, push, Jira summary, and workflow archive
 
-This skill must generate text only.
+This skill primarily generates text. If finalization is explicitly requested, it defines the required approval gate before commit/push/archive actions.
 
-Do not run `git commit`.
-Do not run `git push`.
+Do not run `git commit` or `git push` until the finalization approval gate is shown and the user explicitly approves the exact branch, push target, file list, and commit message.
 Do not create branches.
 Do not open Pull Requests.
 Do not mutate source code.
@@ -34,6 +34,14 @@ Before generating commit or PR text, inspect:
 - Design Doc when available
 - `git status`
 - `git diff`
+
+For finalization, also inspect:
+
+- `git branch --show-current`
+- `git branch -vv`
+- `git remote -v`
+- `git log --oneline -10`
+- `git diff --cached` after staging and before commit
 
 Use the Jira ID from workflow metadata as the canonical issue ID.
 
@@ -285,7 +293,51 @@ Set:
 - [x] commit-message
 ```
 
-Do not archive the workflow unless explicitly requested.
+Do not archive the workflow unless explicitly requested as part of finalization.
+
+## Finalization Plan Standard
+
+When the user asks to finalize a completed workflow, prepare a finalization plan after generating commit/PR text.
+
+The finalization plan must include:
+
+- Jira issue key and URL
+- current branch
+- upstream branch if present
+- push remote and target branch
+- files intended for staging/commit
+- exact commit message
+- Jira final comment summary
+- workflow archive target path
+
+Before running `git add`, `git commit`, `git push`, or archiving workflow state, ask for explicit approval using:
+
+```text
+Finalization Approval Required
+
+Branch:
+- Current branch: {branch}
+- Upstream: {upstream or "none"}
+- Push target: {remote}/{branch}
+
+Files to commit:
+- {file list from git status}
+
+Commit message:
+{commit message}
+
+Jira update:
+- Issue: {JIRA_ID}
+- Final comment: will add implementation/test/lint summary
+
+Workflow archive:
+- From: `.agents/workflow/current.md`
+- To: `.agents/workflow/archive/{JIRA_ID}-{slug}.md`
+
+Approve commit and push to `{remote}/{branch}`?
+```
+
+If the user approves, the finalizer may stage intended files, commit, push, add/update Jira, archive workflow, and reset `.agents/workflow/current.md`. If the user does not approve, stop without changing git state.
 
 ## Output Format
 
@@ -305,13 +357,25 @@ Notes:
 -
 ```
 
+When finalizing, return:
+
+```text
+Finalization Result:
+- Jira Issue:
+- Branch:
+- Commit:
+- Push Target:
+- Jira Update:
+- Workflow Archive:
+- Notes:
+```
+
 ## Safety Rules
 
-- Do not run `git commit`.
-- Do not run `git push`.
+- Do not run `git commit` or `git push` without explicit approval of the finalization gate.
 - Do not create a branch.
 - Do not open a PR.
-- Do not modify files except `.agents/workflow/current.md`.
+- Do not modify source files. During approved finalization, workflow archive/reset files may be modified.
 - Do not include secrets, tokens, `.env` values, or credentials.
 - Do not invent test results.
 - Do not invent Jira links.

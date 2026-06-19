@@ -249,7 +249,7 @@ It must:
 
 #### `commit-message`
 
-Responsible for commit and PR text.
+Responsible for commit/PR text and final workflow finalization when explicitly requested.
 
 It must:
 
@@ -261,6 +261,8 @@ It must:
 - include Jira ID
 - include docs links
 - include tests/lint status
+- when finalization is requested, show branch/upstream/push target/files/commit message and ask for explicit approval before staging, committing, pushing, Jira final comment, or workflow archive
+- after explicit approval, stage only intended files, commit, push to the approved target, add/update Jira with the final summary, archive workflow, and reset `.agents/workflow/current.md`
 
 ## Jira-First Workflow
 
@@ -296,6 +298,10 @@ tests
 lint
 ↓
 commit/PR draft
+↓
+finalization approval
+↓
+commit and push
 ↓
 Jira update/comment
 ↓
@@ -646,6 +652,8 @@ Workflow state template:
 - [ ] Tests run or explicitly skipped with reason
 - [ ] Lint/typecheck run or explicitly skipped with reason
 - [ ] Jira commented with implementation/test summary
+- [ ] Commit created after explicit approval
+- [ ] Push completed after explicit approval
 - [ ] Workflow archived
 
 ## Commit Message Draft
@@ -655,6 +663,23 @@ Workflow state template:
 ## Pull Request Description Draft
 
 -
+
+## Finalization Plan
+
+- Branch:
+- Upstream:
+- Push Target:
+- Files To Commit:
+- Commit Message:
+- Jira Final Comment:
+- Workflow Archive:
+
+## Finalization Results
+
+- Commit:
+- Push:
+- Jira Update:
+- Workflow Archive:
 ```
 
 When a task is complete, archive the workflow to:
@@ -684,9 +709,38 @@ Do not spam Jira with low-value comments.
 
 Prefer one concise comment per major workflow phase.
 
+## Finalization Rules
+
+The `commit-message` agent owns final workflow finalization after tests and lint pass.
+
+Before staging, committing, pushing, or archiving, it must show:
+
+- current branch
+- upstream branch, if any
+- push remote and target branch
+- files to be committed
+- exact commit message
+- Jira issue and final comment summary
+- workflow archive path
+
+It must ask for explicit user approval before running `git add`, `git commit`, `git push`, or archiving workflow state.
+
+If approved, it may:
+
+- stage only intended files
+- commit with the approved message
+- push to the approved remote/branch
+- update Jira with final implementation/test/lint summary
+- archive `.agents/workflow/current.md` to `.agents/workflow/archive/{JIRA_ID}-{slug}.md`
+- reset `.agents/workflow/current.md`
+
+If approval is not provided, it must stop without changing git state or archiving workflow.
+
 ## Command Rules
 
 Commands must run from the relevant project directory, never from the repository root.
+
+Exception: repository-level Git/finalization commands (`git status`, `git diff`, `git add`, `git commit`, `git push`, workflow archive/reset) must run from the repository root so paths and repository state are correct.
 
 If a command can modify data, delete files, change dependencies, run migrations, or affect credentials, ask for approval first.
 
