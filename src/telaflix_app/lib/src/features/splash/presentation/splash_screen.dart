@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
-import '../../home/presentation/home_screen.dart';
+import '../../auth/presentation/login_screen.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -53,7 +53,7 @@ class _SplashScreenState extends State<SplashScreen>
     _logoEntranceController.forward();
     _logoPulseController.repeat(reverse: true);
 
-    _navigationTimer = Timer(_navigateDelay, _openHomeScreen);
+    _navigationTimer = Timer(_navigateDelay, _openLoginScreen);
   }
 
   @override
@@ -64,13 +64,13 @@ class _SplashScreenState extends State<SplashScreen>
     super.dispose();
   }
 
-  void _openHomeScreen() {
+  void _openLoginScreen() {
     if (!mounted) return;
 
     Navigator.of(context).pushReplacement(
       PageRouteBuilder<void>(
         pageBuilder: (context, animation, secondaryAnimation) =>
-            const HomeScreen(),
+            const LoginScreen(),
         transitionsBuilder: (context, animation, secondaryAnimation, child) {
           return FadeTransition(opacity: animation, child: child);
         },
