@@ -651,6 +651,8 @@ Workflow state template:
 - [ ] Review completed
 - [ ] Tests run or explicitly skipped with reason
 - [ ] Lint/typecheck run or explicitly skipped with reason
+- [ ] PRD acceptance criteria checked/resolved before finalization
+- [ ] PRD and Design Doc open questions resolved before finalization
 - [ ] Jira commented with implementation/test summary
 - [ ] Commit created after explicit approval
 - [ ] Push completed after explicit approval
@@ -671,6 +673,7 @@ Workflow state template:
 - Push Target:
 - Files To Commit:
 - Commit Message:
+- Documentation Final Sync:
 - Jira Final Comment:
 - Workflow Archive:
 
@@ -720,19 +723,33 @@ Before staging, committing, pushing, or archiving, it must show:
 - push remote and target branch
 - files to be committed
 - exact commit message
+- documentation final sync status
 - Jira issue and final comment summary
 - workflow archive path
+
+Before showing the final approval gate, it must update final documentation so completed work does not leave stale docs:
+
+- PRD status reflects the final task state (`Implemented` or equivalent repository convention)
+- PRD acceptance criteria are checked when satisfied
+- PRD open questions are resolved or explicitly marked `None`
+- Design Doc status reflects the final task state (`Implemented` or equivalent repository convention)
+- Design Doc open questions are resolved or explicitly marked `None`
+- ADR status is accepted when the decision was used
+
+It must not ask for final commit/push approval while PRD/Design Doc open questions or PRD acceptance criteria are stale for completed work.
 
 It must ask for explicit user approval before running `git add`, `git commit`, `git push`, or archiving workflow state.
 
 If approved, it may:
 
-- stage only intended files
+- stage all intended files for the Jira task and related workflow/docs/configuration updates in one commit
 - commit with the approved message
 - push to the approved remote/branch
 - update Jira with final implementation/test/lint summary
 - archive `.agents/workflow/current.md` to `.agents/workflow/archive/{JIRA_ID}-{slug}.md`
 - reset `.agents/workflow/current.md`
+
+Default finalization behavior is one commit per completed Jira task. Do not ask whether to split commits unless the user explicitly requests split commits or unrelated changes are present.
 
 If approval is not provided, it must stop without changing git state or archiving workflow.
 

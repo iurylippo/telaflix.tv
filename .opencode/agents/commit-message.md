@@ -67,8 +67,11 @@ Generate:
 When explicitly asked to finalize, also:
 
 4. Add a concise Jira implementation/test summary when possible.
-5. Present the final commit/push approval gate.
-6. After approval only, stage intended files, commit, push to the shown branch/remote, archive workflow, and reset `.agents/workflow/current.md`.
+5. Sync PRD/ADR/Design Doc final status/content before presenting the commit/push approval gate.
+6. Present the final commit/push approval gate.
+7. After approval only, stage intended files, commit, push to the shown branch/remote, archive workflow, and reset `.agents/workflow/current.md`.
+
+Default finalization behavior: use a single commit containing all files intentionally changed for the Jira task and its workflow/docs/configuration updates. Do not ask whether to split the work into multiple commits unless the user explicitly requests split commits or the diff contains unrelated changes.
 
 Update `.agents/workflow/current.md`:
 
@@ -79,6 +82,7 @@ Update `.agents/workflow/current.md`:
 When finalizing, also update:
 
 - `Finalization Plan`
+- `Documentation Final Sync`
 - `Jira Final Comment`
 - `Commit Result`
 - `Push Result`
@@ -249,6 +253,18 @@ gh pr create
 
 ## Finalization Approval Gate
 
+Before presenting the approval block, verify and update final documentation:
+
+- PRD status reflects the final task state (`Implemented` or equivalent repository convention).
+- PRD acceptance criteria are checked when they are actually satisfied.
+- PRD open questions are resolved or explicitly marked `None`.
+- Design Doc status reflects the final task state (`Implemented` or equivalent repository convention).
+- Design Doc open questions are resolved or explicitly marked `None`.
+- ADR status is accepted when the decision was used.
+- Workflow links still point to the final docs and Jira issue.
+
+Do not archive workflow or ask for commit approval while docs contain stale unchecked acceptance criteria or stale open questions for completed work.
+
 Before staging, committing, pushing, or archiving, output this approval block and stop:
 
 ```text
@@ -262,12 +278,21 @@ Branch:
 Files to commit:
 - {file list from git status}
 
+Commit grouping:
+- Single commit by default for all intended task/workflow changes.
+
 Commit message:
 {commit message}
 
 Jira update:
 - Issue: {JIRA_ID}
 - Final comment: will add implementation/test/lint summary
+
+Documentation final sync:
+- PRD acceptance criteria: checked/resolved
+- PRD open questions: none/resolved
+- Design Doc open questions: none/resolved
+- ADR status: accepted when applicable
 
 Workflow archive:
 - From: `.agents/workflow/current.md`
@@ -281,14 +306,15 @@ Only proceed if the user explicitly approves. If the user does not approve, leav
 ## Finalization Steps After Approval
 
 1. Re-check `git status`, current branch, upstream, remotes, and recent commits.
-2. Stage only intended files.
-3. Inspect `git diff --cached`.
-4. Commit with the approved message.
-5. Push to the approved remote/branch.
-6. Add/update Jira with a concise final implementation/test/lint summary when the MCP tools allow it.
-7. Archive `.agents/workflow/current.md` to `.agents/workflow/archive/{JIRA_ID}-{slug}.md`.
-8. Reset `.agents/workflow/current.md` to the base workflow template.
-9. Return commit hash, push target, archive path, Jira update status, and any skipped step with reason.
+2. Verify final PRD/ADR/Design Doc sync is complete; update docs if needed before staging.
+3. Stage all intended files for the Jira task and related workflow/docs/configuration updates in one commit.
+4. Inspect `git diff --cached`.
+5. Commit with the approved message.
+6. Push to the approved remote/branch.
+7. Add/update Jira with a concise final implementation/test/lint summary when the MCP tools allow it.
+8. Archive `.agents/workflow/current.md` to `.agents/workflow/archive/{JIRA_ID}-{slug}.md`.
+9. Reset `.agents/workflow/current.md` to the base workflow template.
+10. Return commit hash, push target, archive path, Jira update status, and any skipped step with reason.
 
 ## Workflow Update Format
 
@@ -364,6 +390,8 @@ Finalization Result:
 - Do not edit implementation files.
 - Do not edit PRD, ADR, or Design Doc files.
 - Do not stage, commit, push, or archive until the user explicitly approves the finalization approval block.
+- Do not ask whether to use one commit or split commits; use one commit by default unless the user asks otherwise or unrelated changes are present.
+- Do not present the finalization approval block while PRD/Design Doc open questions or PRD acceptance criteria are stale for completed work.
 - Do not open Pull Requests.
 - Do not archive workflow unless explicitly requested as part of finalization.
 - Do not invent test results.

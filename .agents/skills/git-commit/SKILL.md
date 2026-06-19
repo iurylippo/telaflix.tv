@@ -308,7 +308,24 @@ The finalization plan must include:
 - files intended for staging/commit
 - exact commit message
 - Jira final comment summary
+- documentation final sync summary
 - workflow archive target path
+
+Documentation final sync is required before approval:
+
+- PRD status reflects the final task state (`Implemented` or equivalent repository convention).
+- PRD acceptance criteria are checked when satisfied.
+- PRD open questions are resolved or explicitly marked `None`.
+- Design Doc status reflects the final task state (`Implemented` or equivalent repository convention).
+- Design Doc open questions are resolved or explicitly marked `None`.
+- ADR status is accepted when the decision was used.
+
+Do not ask for final commit/push approval while completed-work docs still contain stale unchecked acceptance criteria or stale open questions.
+
+Default commit grouping:
+
+- Use one commit containing all intentional changes for the Jira task, including related workflow, documentation, and agent/config updates.
+- Do not ask the user to choose between one commit and split commits unless they explicitly request split commits or unrelated changes are present.
 
 Before running `git add`, `git commit`, `git push`, or archiving workflow state, ask for explicit approval using:
 
@@ -323,12 +340,21 @@ Branch:
 Files to commit:
 - {file list from git status}
 
+Commit grouping:
+- Single commit by default for all intended task/workflow changes.
+
 Commit message:
 {commit message}
 
 Jira update:
 - Issue: {JIRA_ID}
 - Final comment: will add implementation/test/lint summary
+
+Documentation final sync:
+- PRD acceptance criteria: checked/resolved
+- PRD open questions: none/resolved
+- Design Doc open questions: none/resolved
+- ADR status: accepted when applicable
 
 Workflow archive:
 - From: `.agents/workflow/current.md`
@@ -337,7 +363,7 @@ Workflow archive:
 Approve commit and push to `{remote}/{branch}`?
 ```
 
-If the user approves, the finalizer may stage intended files, commit, push, add/update Jira, archive workflow, and reset `.agents/workflow/current.md`. If the user does not approve, stop without changing git state.
+If the user approves, the finalizer may stage all intended files in one commit, commit, push, add/update Jira, archive workflow, and reset `.agents/workflow/current.md`. If the user does not approve, stop without changing git state.
 
 ## Output Format
 
@@ -373,6 +399,8 @@ Finalization Result:
 ## Safety Rules
 
 - Do not run `git commit` or `git push` without explicit approval of the finalization gate.
+- Do not ask whether to use one commit or split commits; use one commit by default unless the user asks otherwise or unrelated changes are present.
+- Do not ask for finalization approval while PRD/Design Doc open questions or PRD acceptance criteria are stale for completed work.
 - Do not create a branch.
 - Do not open a PR.
 - Do not modify source files. During approved finalization, workflow archive/reset files may be modified.

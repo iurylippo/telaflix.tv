@@ -57,11 +57,11 @@ Create a development-ready task for a new Flutter app named `Telaflix.TV`, targe
 
 ## Acceptance Criteria
 
-- [ ] Jira issue `IXSTREAM-8` is linked to the PRD, ADR, Design Doc, and workflow state.
-- [ ] Architecture recommendation is documented before implementation begins.
-- [ ] Planner has enough scope to create a concrete scaffold plan for Android and iOS.
-- [ ] Implementation remains blocked until PRD/design/ADR are approved and the plan is reviewed.
-- [ ] Future implementation uses app name `Telaflix.TV` and package/bundle identifier `tv.telaflix.app`.
+- [x] Jira issue `IXSTREAM-8` is linked to the PRD, ADR, Design Doc, and workflow state.
+- [x] Architecture recommendation is documented before implementation begins.
+- [x] Planner has enough scope to create a concrete scaffold plan for Android and iOS.
+- [x] Implementation remains blocked until PRD/design/ADR are approved and the plan is reviewed.
+- [x] Future implementation uses app name `Telaflix.TV` and package/bundle identifier `tv.telaflix.app`.
 
 ## Risks
 
@@ -72,5 +72,9 @@ Create a development-ready task for a new Flutter app named `Telaflix.TV`, targe
 
 ## Open Questions
 
-- Should the implementation agent create the Flutter project directly under `src/` or under a nested app folder such as `src/telaflix_app/`?
-- Should the initial scaffold include only Flutter SDK dependencies, or should approved architecture dependencies be added immediately?
+None.
+
+Resolved during implementation:
+
+- Flutter project created under `src/telaflix_app/`.
+- Initial scaffold includes only Flutter SDK/default dependencies; Riverpod and `go_router` are deferred until a future feature requires them or they are explicitly approved.

@@ -101,5 +101,9 @@ Commands must be run from the Flutter app directory, not from the repository roo
 
 ## Open Questions
 
-- Confirm app folder path under `src/`, for example `src/telaflix_app/`.
-- Confirm whether to add initial architecture dependencies during scaffold or defer until the first product feature.
+None.
+
+Resolved during implementation:
+
+- App folder path is `src/telaflix_app/`.
+- Initial scaffold uses only Flutter SDK/default dependencies; Riverpod and `go_router` are deferred until a future feature requires them or they are explicitly approved.
