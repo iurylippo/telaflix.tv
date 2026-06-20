@@ -57,6 +57,30 @@ void main() {
     await tester.pump();
     await tester.pump(const Duration(seconds: 1));
 
-    expect(find.text('Telaflix.TV'), findsWidgets);
+    expect(find.byKey(const Key('home-screen')), findsOneWidget);
+    expect(find.byKey(const Key('home-top-bar-logo')), findsOneWidget);
+    expect(find.byKey(const Key('home-top-bar-search')), findsOneWidget);
+    expect(find.byKey(const Key('home-top-bar-avatar')), findsOneWidget);
+    expect(find.text('Boa noite, Iury'), findsOneWidget);
+    expect(find.text('Amanhecer Vermelho'), findsWidgets);
+    expect(find.text('Continuar assistindo'), findsOneWidget);
+    expect(find.byKey(const Key('bottom-nav-home')), findsOneWidget);
+
+    final activeHomeNavText = tester.widget<Text>(find.text('Inicio'));
+    expect(activeHomeNavText.style?.fontWeight, FontWeight.w700);
+
+    await tester.scrollUntilVisible(
+      find.text('Filmes em destaque'),
+      300,
+      scrollable: find.byType(Scrollable).first,
+    );
+    expect(find.text('Filmes em destaque'), findsOneWidget);
+
+    await tester.scrollUntilVisible(
+      find.text('Canais ao vivo'),
+      300,
+      scrollable: find.byType(Scrollable).first,
+    );
+    expect(find.text('Canais ao vivo'), findsOneWidget);
   });
 }

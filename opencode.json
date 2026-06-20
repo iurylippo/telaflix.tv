@@ -12,10 +12,10 @@
   },
   "agent": {
     "brainstormer": {
-      "model": "openai/gpt-5.4"
+      "model": "openai/gpt-5.5"
     },
     "planner": {
-      "model": "openai/gpt-5.4"
+      "model": "openai/gpt-5.5"
     },
     "plan-reviewer": {
       "model": "openai/gpt-5.5"
