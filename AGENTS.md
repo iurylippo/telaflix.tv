@@ -165,6 +165,21 @@ commit-message
 
 ### Agent Responsibilities
 
+### Implementation Exclusivity
+
+Only the configured `@implementor` agent may edit production code, tests, fixtures, app assets, or implementation-related files for a planned Jira task.
+
+The primary agent, planner, brainstormer, reviewer, tester, linter, and commit-message agents must not start implementation edits, including TDD test edits, even when the next step is obvious. They may only update files explicitly owned by their phase, such as PRDs, workflow state, review notes, or validation results.
+
+If a non-implementor agent accidentally edits implementation files, it must stop immediately, revert only its own accidental edits, record the process correction in `.agents/workflow/current.md`, and hand off to `@implementor`.
+
+Implementation may begin only after:
+
+- Jira/PRD/workflow setup is complete.
+- The planner has recorded an approved technical plan.
+- The Jira implementation start gate passes.
+- The user explicitly invokes or approves `@implementor` for the task.
+
 #### `brainstormer`
 
 Responsible for turning a raw idea into a development-ready task.

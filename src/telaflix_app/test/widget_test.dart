@@ -65,8 +65,16 @@ void main() {
     expect(find.text('Amanhecer Vermelho'), findsWidgets);
     expect(find.text('Continuar assistindo'), findsOneWidget);
     expect(find.byKey(const Key('bottom-nav-home')), findsOneWidget);
+    expect(find.byKey(const Key('bottom-nav-filmes')), findsOneWidget);
+    expect(find.byKey(const Key('bottom-nav-series')), findsOneWidget);
+    expect(find.byKey(const Key('bottom-nav-tv')), findsOneWidget);
 
-    final activeHomeNavText = tester.widget<Text>(find.text('Inicio'));
+    expect(find.text('Home'), findsOneWidget);
+    expect(find.text('Filmes'), findsOneWidget);
+    expect(find.text('Series'), findsOneWidget);
+    expect(find.text('TV'), findsOneWidget);
+
+    final activeHomeNavText = tester.widget<Text>(find.text('Home'));
     expect(activeHomeNavText.style?.fontWeight, FontWeight.w700);
 
     await tester.scrollUntilVisible(
@@ -82,5 +90,35 @@ void main() {
       scrollable: find.byType(Scrollable).first,
     );
     expect(find.text('Canais ao vivo'), findsOneWidget);
+
+    await tester.tap(find.byKey(const Key('bottom-nav-filmes')));
+    await tester.pump();
+
+    expect(find.byKey(const Key('home-screen')), findsOneWidget);
+    final deselectedHomeNavText = tester.widget<Text>(find.text('Home'));
+    expect(deselectedHomeNavText.style?.fontWeight, FontWeight.w500);
+
+    final selectedFilmesNavText = tester.widget<Text>(find.text('Filmes'));
+    expect(selectedFilmesNavText.style?.fontWeight, FontWeight.w700);
+
+    await tester.tap(find.byKey(const Key('bottom-nav-series')));
+    await tester.pump();
+
+    expect(find.byKey(const Key('home-screen')), findsOneWidget);
+    final deselectedFilmesNavText = tester.widget<Text>(find.text('Filmes'));
+    expect(deselectedFilmesNavText.style?.fontWeight, FontWeight.w500);
+
+    final selectedSeriesNavText = tester.widget<Text>(find.text('Series'));
+    expect(selectedSeriesNavText.style?.fontWeight, FontWeight.w700);
+
+    await tester.tap(find.byKey(const Key('bottom-nav-tv')));
+    await tester.pump();
+
+    expect(find.byKey(const Key('home-screen')), findsOneWidget);
+    final deselectedSeriesNavText = tester.widget<Text>(find.text('Series'));
+    expect(deselectedSeriesNavText.style?.fontWeight, FontWeight.w500);
+
+    final selectedTVNavText = tester.widget<Text>(find.text('TV'));
+    expect(selectedTVNavText.style?.fontWeight, FontWeight.w700);
   });
 }
