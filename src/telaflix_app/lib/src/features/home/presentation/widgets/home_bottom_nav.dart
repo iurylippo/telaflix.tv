@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 
-class HomeBottomNav extends StatefulWidget {
-  const HomeBottomNav({super.key});
+class HomeBottomNav extends StatelessWidget {
+  const HomeBottomNav({
+    super.key,
+    this.selectedIndex = 0,
+    this.onItemSelected,
+  });
 
-  @override
-  State<HomeBottomNav> createState() => _HomeBottomNavState();
-}
-
-class _HomeBottomNavState extends State<HomeBottomNav> {
-  int _selectedIndex = 0;
+  final int selectedIndex;
+  final ValueChanged<int>? onItemSelected;
 
   @override
   Widget build(BuildContext context) {
@@ -30,29 +30,36 @@ class _HomeBottomNavState extends State<HomeBottomNav> {
                 key: const Key('bottom-nav-home'),
                 icon: Icons.home_filled,
                 label: 'Home',
-                selected: _selectedIndex == 0,
-                onTap: () => setState(() => _selectedIndex = 0),
+                selected: selectedIndex == 0,
+                onTap: () => onItemSelected?.call(0),
               ),
               _NavItem(
                 key: const Key('bottom-nav-filmes'),
                 icon: Icons.movie_rounded,
                 label: 'Filmes',
-                selected: _selectedIndex == 1,
-                onTap: () => setState(() => _selectedIndex = 1),
+                selected: selectedIndex == 1,
+                onTap: () => onItemSelected?.call(1),
               ),
               _NavItem(
                 key: const Key('bottom-nav-series'),
                 icon: Icons.tv_rounded,
                 label: 'Series',
-                selected: _selectedIndex == 2,
-                onTap: () => setState(() => _selectedIndex = 2),
+                selected: selectedIndex == 2,
+                onTap: () => onItemSelected?.call(2),
               ),
               _NavItem(
                 key: const Key('bottom-nav-tv'),
                 icon: Icons.live_tv_rounded,
                 label: 'TV',
-                selected: _selectedIndex == 3,
-                onTap: () => setState(() => _selectedIndex = 3),
+                selected: selectedIndex == 3,
+                onTap: () => onItemSelected?.call(3),
+              ),
+              _NavItem(
+                key: const Key('bottom-nav-profile'),
+                icon: Icons.person_rounded,
+                label: 'Perfil',
+                selected: selectedIndex == 4,
+                onTap: () => onItemSelected?.call(4),
               ),
             ],
           ),
@@ -84,7 +91,7 @@ class _NavItem extends StatelessWidget {
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -94,7 +101,7 @@ class _NavItem extends StatelessWidget {
               label,
               style: TextStyle(
                 color: color,
-                fontSize: 11,
+                fontSize: 10,
                 fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
               ),
             ),
