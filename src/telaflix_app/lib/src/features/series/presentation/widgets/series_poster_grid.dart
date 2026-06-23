@@ -4,9 +4,14 @@ import '../../domain/series_content.dart';
 import 'series_poster_card.dart';
 
 class SeriesPosterGrid extends StatelessWidget {
-  const SeriesPosterGrid({super.key, required this.posters});
+  const SeriesPosterGrid({
+    super.key,
+    required this.posters,
+    this.onPosterSelected,
+  });
 
   final List<SeriesPosterItem> posters;
+  final ValueChanged<SeriesPosterItem>? onPosterSelected;
 
   @override
   Widget build(BuildContext context) {
@@ -35,7 +40,12 @@ class SeriesPosterGrid extends StatelessWidget {
                 SizedBox(
                   width: cardWidth,
                   height: cardHeight,
-                  child: SeriesPosterCard(item: poster),
+                  child: SeriesPosterCard(
+                    item: poster,
+                    onTap: onPosterSelected != null
+                        ? () => onPosterSelected!(poster)
+                        : null,
+                  ),
                 ),
             ],
           ),

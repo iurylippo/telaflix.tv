@@ -3,16 +3,20 @@ import 'package:flutter/material.dart';
 import '../../domain/series_content.dart';
 
 class FeaturedSeriesCard extends StatelessWidget {
-  const FeaturedSeriesCard({super.key, required this.item});
+  const FeaturedSeriesCard({super.key, required this.item, this.onTap});
 
   final FeaturedSeriesItem item;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
     final accentColor = Color(item.colorValue);
 
-    return Container(
-      width: 300,
+    return GestureDetector(
+      onTap: onTap,
+      behavior: HitTestBehavior.opaque,
+      child: Container(
+        width: 300,
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(24),
@@ -80,6 +84,7 @@ class FeaturedSeriesCard extends StatelessWidget {
             style: const TextStyle(color: Color(0xFF5A5A6E), fontSize: 11),
           ),
         ],
+      ),
       ),
     );
   }

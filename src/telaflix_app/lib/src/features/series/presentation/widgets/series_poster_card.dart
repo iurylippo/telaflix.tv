@@ -3,9 +3,10 @@ import 'package:flutter/material.dart';
 import '../../domain/series_content.dart';
 
 class SeriesPosterCard extends StatelessWidget {
-  const SeriesPosterCard({super.key, required this.item});
+  const SeriesPosterCard({super.key, required this.item, this.onTap});
 
   final SeriesPosterItem item;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -14,7 +15,10 @@ class SeriesPosterCard extends StatelessWidget {
     final seasonLabel =
         '${item.seasonCount} ${item.seasonCount == 1 ? 'temporada' : 'temporadas'}';
 
-    return Column(
+    return GestureDetector(
+      onTap: onTap,
+      behavior: HitTestBehavior.opaque,
+      child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Expanded(
@@ -55,6 +59,7 @@ class SeriesPosterCard extends StatelessWidget {
           style: const TextStyle(color: Color(0xFF8A8A98), fontSize: 10),
         ),
       ],
+      ),
     );
   }
 }

@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:telaflix_app/src/app/app.dart';
+import 'package:telaflix_app/src/features/series/data/mock_series_content.dart';
+import 'package:telaflix_app/src/features/series/presentation/series_detail_screen.dart';
 import 'package:telaflix_app/src/features/series/presentation/series_screen.dart';
 
 void main() {
@@ -215,6 +217,233 @@ void main() {
 
       expect(find.text('3 temporadas'), findsWidgets);
       expect(find.text('1 temporada'), findsWidgets);
+    });
+
+    testWidgets('tapping featured card navigates to detail screen', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        const MaterialApp(home: SeriesScreen()),
+      );
+
+      await tester.tap(find.text('Codigo das Sombras').first);
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 500));
+
+      expect(find.byKey(const Key('series-detail-screen')), findsOneWidget);
+      expect(find.byKey(const Key('detail-title')), findsOneWidget);
+      expect(find.byKey(const Key('detail-synopsis')), findsOneWidget);
+    });
+
+    testWidgets('tapping poster card navigates to detail screen', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        const MaterialApp(home: SeriesScreen()),
+      );
+
+      await tester.scrollUntilVisible(
+        find.text('Horizonte Final'),
+        200,
+        scrollable: find.byType(Scrollable).first,
+      );
+      await tester.pump();
+
+      await tester.tap(find.text('Horizonte Final').first);
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 500));
+
+      expect(find.byKey(const Key('series-detail-screen')), findsOneWidget);
+      expect(find.byKey(const Key('detail-title')), findsOneWidget);
+      expect(find.text('Horizonte Final'), findsOneWidget);
+    });
+
+    testWidgets('detail screen shows all main sections', (
+      WidgetTester tester,
+    ) async {
+      tester.view.physicalSize = const Size(390, 1600);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(() {
+        tester.view.resetPhysicalSize();
+        tester.view.resetDevicePixelRatio();
+      });
+
+      final detail = mockSeriesDetails['codigo-das-sombras']!;
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: SeriesDetailScreen(detail: detail),
+        ),
+      );
+
+      expect(find.byKey(const Key('series-detail-screen')), findsOneWidget);
+      expect(find.byKey(const Key('detail-title')), findsOneWidget);
+      expect(find.text('Codigo das Sombras'), findsOneWidget);
+      expect(find.byKey(const Key('detail-synopsis')), findsOneWidget);
+      expect(find.byKey(const Key('detail-genre-chips')), findsOneWidget);
+      expect(find.byKey(const Key('detail-hero-poster')), findsOneWidget);
+      expect(find.byKey(const Key('detail-cta-button')), findsOneWidget);
+      expect(find.text('Continuar assistindo'), findsOneWidget);
+
+      await tester.scrollUntilVisible(
+        find.byKey(const Key('episodes-section-title')),
+        300,
+        scrollable: find.byType(Scrollable).first,
+      );
+      expect(find.byKey(const Key('episodes-section-title')), findsOneWidget);
+      expect(find.byKey(const Key('season-selector')), findsOneWidget);
+      expect(find.text('Temporada 1'), findsOneWidget);
+      expect(find.text('Temporada 2'), findsOneWidget);
+
+      await tester.scrollUntilVisible(
+        find.byKey(const Key('cast-section-title')),
+        300,
+        scrollable: find.byType(Scrollable).first,
+      );
+      expect(find.byKey(const Key('cast-section-title')), findsOneWidget);
+
+      await tester.scrollUntilVisible(
+        find.byKey(const Key('related-section-title')),
+        300,
+        scrollable: find.byType(Scrollable).first,
+      );
+      expect(find.byKey(const Key('related-section-title')), findsOneWidget);
+    });
+
+    testWidgets('season switching updates episode list', (
+      WidgetTester tester,
+    ) async {
+      tester.view.physicalSize = const Size(390, 1200);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(() {
+        tester.view.resetPhysicalSize();
+        tester.view.resetDevicePixelRatio();
+      });
+
+      final detail = mockSeriesDetails['codigo-das-sombras']!;
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: SeriesDetailScreen(detail: detail),
+        ),
+      );
+
+      await tester.scrollUntilVisible(
+        find.byKey(const Key('season-selector')),
+        300,
+        scrollable: find.byType(Scrollable).first,
+      );
+
+      expect(find.byKey(const Key('season-selector')), findsOneWidget);
+      expect(find.text('4 episodios'), findsOneWidget);
+
+      await tester.tap(find.text('Temporada 2'));
+      await tester.pump();
+
+      expect(find.text('2 episodios'), findsOneWidget);
+      expect(find.text('Rastros do Passado'), findsOneWidget);
+      expect(find.text('Testemunha Protegida'), findsOneWidget);
+    });
+
+    testWidgets('episode list has a fixed-height scrollable container', (
+      WidgetTester tester,
+    ) async {
+      tester.view.physicalSize = const Size(390, 1600);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(() {
+        tester.view.resetPhysicalSize();
+        tester.view.resetDevicePixelRatio();
+      });
+
+      final detail = mockSeriesDetails['codigo-das-sombras']!;
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: SeriesDetailScreen(detail: detail),
+        ),
+      );
+
+      await tester.scrollUntilVisible(
+        find.byKey(const Key('episode-scrollable-container')),
+        300,
+        scrollable: find.byType(Scrollable).first,
+      );
+
+      expect(find.byKey(const Key('episode-scrollable-container')), findsOneWidget);
+
+      final sizedBox = tester.widget<SizedBox>(
+        find.ancestor(
+          of: find.byKey(const Key('episode-scrollable-container')),
+          matching: find.byType(SizedBox),
+        ).first,
+      );
+      expect(sizedBox.height, 580);
+
+      final nestedScrollable = find.descendant(
+        of: find.byKey(const Key('episode-scrollable-container')),
+        matching: find.byType(Scrollable),
+      );
+      expect(nestedScrollable, findsWidgets);
+    });
+
+    testWidgets('back button returns to series screen', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        const MaterialApp(home: SeriesScreen()),
+      );
+
+      await tester.tap(find.text('Codigo das Sombras').first);
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 500));
+
+      expect(find.byKey(const Key('series-detail-screen')), findsOneWidget);
+
+      await tester.tap(find.byKey(const Key('detail-back-button')));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 500));
+
+      expect(find.byKey(const Key('series-detail-screen')), findsNothing);
+      expect(find.byKey(const Key('series-screen')), findsOneWidget);
+    });
+
+    testWidgets('detail bottom nav has Series active', (
+      WidgetTester tester,
+    ) async {
+      final detail = mockSeriesDetails['codigo-das-sombras']!;
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: SeriesDetailScreen(detail: detail),
+        ),
+      );
+
+      expect(find.byKey(const Key('bottom-nav-series')), findsOneWidget);
+
+      final seriesNavText = tester.widget<Text>(find.text('Series').last);
+      expect(seriesNavText.style?.fontWeight, FontWeight.w700);
+    });
+
+    testWidgets('detail does not overflow on narrow screen', (
+      WidgetTester tester,
+    ) async {
+      tester.view.physicalSize = const Size(375, 812);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(() {
+        tester.view.resetPhysicalSize();
+        tester.view.resetDevicePixelRatio();
+      });
+
+      final detail = mockSeriesDetails['codigo-das-sombras']!;
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: SeriesDetailScreen(detail: detail),
+        ),
+      );
+
+      expect(find.byKey(const Key('series-detail-screen')), findsOneWidget);
+      expect(tester.takeException(), isNull);
     });
   });
 }
