@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:telaflix_app/src/app/app.dart';
+import 'package:telaflix_app/src/features/movies/data/mock_movies_content.dart';
+import 'package:telaflix_app/src/features/movies/presentation/movies_detail_screen.dart';
+import 'package:telaflix_app/src/features/movies/presentation/movies_screen.dart';
 import 'package:telaflix_app/src/features/series/data/mock_series_content.dart';
 import 'package:telaflix_app/src/features/series/presentation/series_detail_screen.dart';
 import 'package:telaflix_app/src/features/series/presentation/series_screen.dart';
@@ -127,6 +130,27 @@ void main() {
       await tester.pump(const Duration(seconds: 1));
 
       expect(find.byKey(const Key('series-screen')), findsOneWidget);
+    });
+
+    testWidgets('tapping Movies nav navigates to Movies screen', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(const TelaflixApp());
+      await tester.pump(const Duration(seconds: 4));
+      await tester.pump();
+      await tester.pump(const Duration(seconds: 1));
+
+      await tester.tap(find.text('Entrar'));
+      await tester.pump();
+      await tester.pump(const Duration(seconds: 1));
+
+      expect(find.byKey(const Key('home-screen')), findsOneWidget);
+
+      await tester.tap(find.byKey(const Key('bottom-nav-filmes')));
+      await tester.pump();
+      await tester.pump(const Duration(seconds: 1));
+
+      expect(find.byKey(const Key('movies-screen')), findsOneWidget);
     });
   });
 
@@ -444,6 +468,404 @@ void main() {
 
       expect(find.byKey(const Key('series-detail-screen')), findsOneWidget);
       expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('SeriesScreen -> MoviesScreen ao tocar bottom-nav-filmes', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        const MaterialApp(home: SeriesScreen()),
+      );
+
+      expect(find.byKey(const Key('series-screen')), findsOneWidget);
+
+      await tester.tap(find.byKey(const Key('bottom-nav-filmes')));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 500));
+
+      expect(find.byKey(const Key('movies-screen')), findsOneWidget);
+    });
+
+    testWidgets('SeriesDetailScreen -> MoviesScreen', (
+      WidgetTester tester,
+    ) async {
+      final detail = mockSeriesDetails['codigo-das-sombras']!;
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: SeriesDetailScreen(detail: detail),
+        ),
+      );
+
+      expect(find.byKey(const Key('series-detail-screen')), findsOneWidget);
+
+      await tester.tap(find.byKey(const Key('bottom-nav-filmes')));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 500));
+
+      expect(find.byKey(const Key('movies-screen')), findsOneWidget);
+    });
+  });
+
+  group('Movies screen', () {
+    testWidgets('renders movies screen with all sections', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        const MaterialApp(home: MoviesScreen()),
+      );
+
+      expect(find.byKey(const Key('movies-screen')), findsOneWidget);
+      expect(find.text('Filmes em Destaque'), findsOneWidget);
+      expect(find.text('Explorar Filmes'), findsOneWidget);
+      expect(find.text('Todos'), findsOneWidget);
+      expect(find.text('Em alta'), findsOneWidget);
+      expect(find.text('Acao'), findsAtLeast(1));
+      expect(find.text('Drama'), findsAtLeast(1));
+      expect(find.text('Comedia'), findsOneWidget);
+      expect(find.text('Terror'), findsAtLeast(1));
+      expect(find.text('Sci-fi'), findsAtLeast(1));
+    });
+
+    testWidgets('Movies bottom nav has Movies active', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        const MaterialApp(home: MoviesScreen()),
+      );
+
+      expect(find.byKey(const Key('bottom-nav-home')), findsOneWidget);
+      expect(find.byKey(const Key('bottom-nav-filmes')), findsOneWidget);
+      expect(find.byKey(const Key('bottom-nav-profile')), findsOneWidget);
+
+      final moviesNavText = tester.widget<Text>(find.text('Filmes'));
+      expect(moviesNavText.style?.fontWeight, FontWeight.w700);
+    });
+
+    testWidgets('navigates back to Home from Movies via bottom nav', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(const TelaflixApp());
+      await tester.pump(const Duration(seconds: 4));
+      await tester.pump();
+      await tester.pump(const Duration(seconds: 1));
+
+      await tester.tap(find.text('Entrar'));
+      await tester.pump();
+      await tester.pump(const Duration(seconds: 1));
+
+      await tester.tap(find.byKey(const Key('bottom-nav-filmes')));
+      await tester.pump();
+      await tester.pump(const Duration(seconds: 1));
+
+      expect(find.byKey(const Key('movies-screen')), findsOneWidget);
+
+      await tester.tap(find.byKey(const Key('bottom-nav-home')));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 500));
+
+      expect(find.byKey(const Key('home-screen')), findsOneWidget);
+    });
+
+    testWidgets('poster grid does not overflow on narrow screen', (
+      WidgetTester tester,
+    ) async {
+      tester.view.physicalSize = const Size(375, 812);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(() {
+        tester.view.resetPhysicalSize();
+        tester.view.resetDevicePixelRatio();
+      });
+
+      await tester.pumpWidget(
+        const MaterialApp(home: MoviesScreen()),
+      );
+
+      expect(find.byKey(const Key('movies-screen')), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('renders duration instead of season count on poster cards', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        const MaterialApp(home: MoviesScreen()),
+      );
+
+      expect(find.text('2h 22min'), findsWidgets);
+      expect(find.text('1h 58min'), findsWidgets);
+      expect(find.text('1h 34min'), findsOneWidget);
+      expect(find.textContaining('temporada'), findsNothing);
+    });
+
+    testWidgets('tapping featured card navigates to detail screen', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        const MaterialApp(home: MoviesScreen()),
+      );
+
+      await tester.tap(find.text('Amanhecer Vermelho').first);
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 500));
+
+      expect(find.byKey(const Key('movies-detail-screen')), findsOneWidget);
+      expect(find.byKey(const Key('detail-title')), findsOneWidget);
+      expect(find.byKey(const Key('detail-synopsis')), findsOneWidget);
+    });
+
+    testWidgets('tapping poster card navigates to detail screen', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        const MaterialApp(home: MoviesScreen()),
+      );
+
+      await tester.scrollUntilVisible(
+        find.text('Ultimo Refugio'),
+        200,
+        scrollable: find.byType(Scrollable).first,
+      );
+      await tester.pump();
+
+      await tester.tap(find.text('Ultimo Refugio').first);
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 500));
+
+      expect(find.byKey(const Key('movies-detail-screen')), findsOneWidget);
+      expect(find.byKey(const Key('detail-title')), findsOneWidget);
+      expect(find.text('Ultimo Refugio'), findsOneWidget);
+    });
+
+    testWidgets('detail screen shows all main sections', (
+      WidgetTester tester,
+    ) async {
+      tester.view.physicalSize = const Size(390, 1600);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(() {
+        tester.view.resetPhysicalSize();
+        tester.view.resetDevicePixelRatio();
+      });
+
+      final detail = mockMoviesDetails['amanhecer-vermelho']!;
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: MoviesDetailScreen(detail: detail),
+        ),
+      );
+
+      expect(find.byKey(const Key('movies-detail-screen')), findsOneWidget);
+      expect(find.byKey(const Key('detail-title')), findsOneWidget);
+      expect(find.text('Amanhecer Vermelho'), findsOneWidget);
+      expect(find.byKey(const Key('detail-synopsis')), findsOneWidget);
+      expect(find.byKey(const Key('detail-genre-chips')), findsOneWidget);
+      expect(find.byKey(const Key('detail-hero-poster')), findsOneWidget);
+      expect(find.byKey(const Key('detail-cta-button')), findsOneWidget);
+      expect(find.text('Assistir agora'), findsOneWidget);
+
+      await tester.scrollUntilVisible(
+        find.byKey(const Key('cast-section-title')),
+        300,
+        scrollable: find.byType(Scrollable).first,
+      );
+      expect(find.byKey(const Key('cast-section-title')), findsOneWidget);
+
+      await tester.scrollUntilVisible(
+        find.byKey(const Key('related-section-title')),
+        300,
+        scrollable: find.byType(Scrollable).first,
+      );
+      expect(find.byKey(const Key('related-section-title')), findsOneWidget);
+    });
+
+    testWidgets('detail screen has no season selector or episode list', (
+      WidgetTester tester,
+    ) async {
+      tester.view.physicalSize = const Size(390, 1200);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(() {
+        tester.view.resetPhysicalSize();
+        tester.view.resetDevicePixelRatio();
+      });
+
+      final detail = mockMoviesDetails['amanhecer-vermelho']!;
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: MoviesDetailScreen(detail: detail),
+        ),
+      );
+
+      expect(find.byKey(const Key('season-selector')), findsNothing);
+      expect(find.byKey(const Key('episodes-section-title')), findsNothing);
+      expect(find.byKey(const Key('episode-scrollable-container')), findsNothing);
+      expect(find.textContaining('Temporada'), findsNothing);
+      expect(find.textContaining('episodios'), findsNothing);
+    });
+
+    testWidgets('back button returns to movies screen', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        const MaterialApp(home: MoviesScreen()),
+      );
+
+      await tester.tap(find.text('Amanhecer Vermelho').first);
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 500));
+
+      expect(find.byKey(const Key('movies-detail-screen')), findsOneWidget);
+
+      await tester.tap(find.byKey(const Key('detail-back-button')));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 500));
+
+      expect(find.byKey(const Key('movies-detail-screen')), findsNothing);
+      expect(find.byKey(const Key('movies-screen')), findsOneWidget);
+    });
+
+    testWidgets('detail bottom nav has Movies active', (
+      WidgetTester tester,
+    ) async {
+      final detail = mockMoviesDetails['amanhecer-vermelho']!;
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: MoviesDetailScreen(detail: detail),
+        ),
+      );
+
+      expect(find.byKey(const Key('bottom-nav-filmes')), findsOneWidget);
+
+      final moviesNavText = tester.widget<Text>(find.text('Filmes').last);
+      expect(moviesNavText.style?.fontWeight, FontWeight.w700);
+    });
+
+    testWidgets('detail does not overflow on narrow screen', (
+      WidgetTester tester,
+    ) async {
+      tester.view.physicalSize = const Size(375, 812);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(() {
+        tester.view.resetPhysicalSize();
+        tester.view.resetDevicePixelRatio();
+      });
+
+      final detail = mockMoviesDetails['amanhecer-vermelho']!;
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: MoviesDetailScreen(detail: detail),
+        ),
+      );
+
+      expect(find.byKey(const Key('movies-detail-screen')), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('MoviesScreen -> SeriesScreen ao tocar bottom-nav-series', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        const MaterialApp(home: MoviesScreen()),
+      );
+
+      expect(find.byKey(const Key('movies-screen')), findsOneWidget);
+
+      await tester.tap(find.byKey(const Key('bottom-nav-series')));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 500));
+
+      expect(find.byKey(const Key('series-screen')), findsOneWidget);
+    });
+
+    testWidgets('MoviesDetailScreen -> SeriesScreen', (
+      WidgetTester tester,
+    ) async {
+      final detail = mockMoviesDetails['amanhecer-vermelho']!;
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: MoviesDetailScreen(detail: detail),
+        ),
+      );
+
+      expect(find.byKey(const Key('movies-detail-screen')), findsOneWidget);
+
+      await tester.tap(find.byKey(const Key('bottom-nav-series')));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 500));
+
+      expect(find.byKey(const Key('series-screen')), findsOneWidget);
+    });
+  });
+
+  group('Bottom nav regression', () {
+    testWidgets('Home -> Movies -> Series -> Home returns to Home, not Movies', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(const TelaflixApp());
+      await tester.pump(const Duration(seconds: 4));
+      await tester.pump();
+      await tester.pump(const Duration(seconds: 1));
+
+      await tester.tap(find.text('Entrar'));
+      await tester.pump();
+      await tester.pump(const Duration(seconds: 1));
+
+      expect(find.byKey(const Key('home-screen')), findsOneWidget);
+
+      await tester.tap(find.byKey(const Key('bottom-nav-filmes')));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 500));
+      expect(find.byKey(const Key('movies-screen')), findsOneWidget);
+
+      await tester.tap(find.byKey(const Key('bottom-nav-series')));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 500));
+      expect(find.byKey(const Key('series-screen')), findsOneWidget);
+
+      await tester.tap(find.byKey(const Key('bottom-nav-home')));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 500));
+
+      expect(find.byKey(const Key('home-screen')), findsOneWidget);
+      expect(find.byKey(const Key('movies-screen')), findsNothing);
+      expect(find.byKey(const Key('series-screen')), findsNothing);
+    });
+
+    testWidgets('Home -> Series -> Movies -> Home returns to Home, not Series', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(const TelaflixApp());
+      await tester.pump(const Duration(seconds: 4));
+      await tester.pump();
+      await tester.pump(const Duration(seconds: 1));
+
+      await tester.tap(find.text('Entrar'));
+      await tester.pump();
+      await tester.pump(const Duration(seconds: 1));
+
+      expect(find.byKey(const Key('home-screen')), findsOneWidget);
+
+      await tester.tap(find.byKey(const Key('bottom-nav-series')));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 500));
+      expect(find.byKey(const Key('series-screen')), findsOneWidget);
+
+      await tester.tap(find.byKey(const Key('bottom-nav-filmes')));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 500));
+      expect(find.byKey(const Key('movies-screen')), findsOneWidget);
+
+      await tester.tap(find.byKey(const Key('bottom-nav-home')));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 500));
+
+      expect(find.byKey(const Key('home-screen')), findsOneWidget);
+      expect(find.byKey(const Key('movies-screen')), findsNothing);
+      expect(find.byKey(const Key('series-screen')), findsNothing);
     });
   });
 }

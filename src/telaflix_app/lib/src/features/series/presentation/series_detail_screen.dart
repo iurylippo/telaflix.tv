@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../home/presentation/widgets/home_bottom_nav.dart';
+import '../../movies/presentation/movies_screen.dart';
 import '../domain/series_content.dart';
 import 'widgets/series_cast_section.dart';
 import 'widgets/series_detail_header.dart';
@@ -33,6 +34,24 @@ class _SeriesDetailScreenState extends State<SeriesDetailScreen> {
         onItemSelected: (index) {
           if (index == 0) {
             Navigator.of(context).popUntil((route) => route.isFirst);
+          }
+          if (index == 1) {
+            Navigator.of(context)
+                .popUntil((route) => route.isFirst);
+            Navigator.of(context).push(
+              PageRouteBuilder<void>(
+                pageBuilder: (context, animation, secondaryAnimation) =>
+                    const MoviesScreen(),
+                transitionsBuilder: (
+                  context,
+                  animation,
+                  secondaryAnimation,
+                  child,
+                ) {
+                  return FadeTransition(opacity: animation, child: child);
+                },
+              ),
+            );
           }
         },
       ),

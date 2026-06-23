@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../movies/presentation/movies_screen.dart';
 import '../../series/presentation/series_screen.dart';
 import '../data/mock_home_content.dart';
 import 'widgets/continue_watching_card.dart';
@@ -23,6 +24,22 @@ class HomeScreen extends StatelessWidget {
       bottomNavigationBar: HomeBottomNav(
         selectedIndex: 0,
         onItemSelected: (index) {
+          if (index == 1) {
+            Navigator.of(context).push(
+              PageRouteBuilder<void>(
+                pageBuilder: (context, animation, secondaryAnimation) =>
+                    const MoviesScreen(),
+                transitionsBuilder: (
+                  context,
+                  animation,
+                  secondaryAnimation,
+                  child,
+                ) {
+                  return FadeTransition(opacity: animation, child: child);
+                },
+              ),
+            );
+          }
           if (index == 2) {
             Navigator.of(context).push(
               PageRouteBuilder<void>(

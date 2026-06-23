@@ -22,7 +22,7 @@
 
 ## Affected Projects
 
-- `src/`
+-
 
 ## Request
 
