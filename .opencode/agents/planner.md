@@ -49,6 +49,8 @@ Before planning, classify the request as one of:
 
 You must write the classification to `.agents/workflow/current.md`.
 
+If the user explicitly asks to "use the planner", "use o planner", or asks you to plan a feature, bug, refactor, UI flow, navigation change, or technical task, that does not authorize skipping earlier repository workflow phases. It means start the workflow that reaches the planner. When Jira, PRD, documentation decisions, or `.agents/workflow/current.md` are missing or stale, your next agent must be `@brainstormer`; after `@brainstormer` completes setup, the planner is invoked again to create the technical implementation plan.
+
 If the user asks the planner to add, change, fix, refactor, or implement app/product behavior, do not bypass the repository workflow just because the code change looks small. Use `standard-task` unless the request is explicitly local-only and purely mechanical.
 
 Use this format:

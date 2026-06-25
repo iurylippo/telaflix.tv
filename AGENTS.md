@@ -150,6 +150,10 @@ Recommended rules:
 
 This repository uses a structured workflow inspired by the OpenCode multi-agent setup.
 
+When the user asks to "use the planner", "use o planner", or otherwise invokes planning for a feature, bug, refactor, UI flow, navigation change, or technical task, do not jump directly to technical planning. Treat that request as an instruction to start the repository workflow that reaches the planner. If Jira, PRD, documentation decisions, or `.agents/workflow/current.md` are missing or stale, route to `brainstormer` first, then return to `planner` after setup is complete.
+
+Only skip this pre-planning workflow when the user explicitly asks for a quick local-only change or the change is purely mechanical, such as a typo, formatting-only edit, obvious one-line import/lint fix, or documentation copy correction.
+
 Default agent order:
 
 ```text
