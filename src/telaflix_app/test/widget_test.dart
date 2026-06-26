@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:telaflix_app/src/app/app.dart';
+import 'package:telaflix_app/src/features/live_tv/presentation/live_tv_screen.dart';
 import 'package:telaflix_app/src/features/movies/data/mock_movies_content.dart';
 import 'package:telaflix_app/src/features/movies/presentation/movies_detail_screen.dart';
 import 'package:telaflix_app/src/features/movies/presentation/movies_screen.dart';
@@ -866,6 +867,269 @@ void main() {
       expect(find.byKey(const Key('home-screen')), findsOneWidget);
       expect(find.byKey(const Key('movies-screen')), findsNothing);
       expect(find.byKey(const Key('series-screen')), findsNothing);
+    });
+  });
+
+  group('Live TV screen', () {
+    testWidgets('renders live tv screen with all sections', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        const MaterialApp(home: LiveTvScreen()),
+      );
+
+      expect(find.byKey(const Key('live-tv-screen')), findsOneWidget);
+      expect(find.text('TV Ao Vivo'), findsOneWidget);
+      expect(find.text('Destaques'), findsOneWidget);
+      expect(find.text('Canais'), findsOneWidget);
+      expect(find.text('Todos'), findsOneWidget);
+      expect(find.text('Abertos'), findsOneWidget);
+      expect(find.text('Filmes'), findsAtLeast(1));
+      expect(find.text('Esportes'), findsAtLeast(1));
+      expect(find.text('Noticias'), findsOneWidget);
+      expect(find.text('Kids'), findsOneWidget);
+    });
+
+    testWidgets('Live TV bottom nav has TV active', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        const MaterialApp(home: LiveTvScreen()),
+      );
+
+      expect(find.byKey(const Key('bottom-nav-home')), findsOneWidget);
+      expect(find.byKey(const Key('bottom-nav-tv')), findsOneWidget);
+      expect(find.byKey(const Key('bottom-nav-profile')), findsOneWidget);
+
+      final tvNavText = tester.widget<Text>(find.text('TV'));
+      expect(tvNavText.style?.fontWeight, FontWeight.w700);
+    });
+
+    testWidgets('navigates back to Home from TV via bottom nav', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(const TelaflixApp());
+      await tester.pump(const Duration(seconds: 4));
+      await tester.pump();
+      await tester.pump(const Duration(seconds: 1));
+
+      await tester.tap(find.text('Entrar'));
+      await tester.pump();
+      await tester.pump(const Duration(seconds: 1));
+
+      await tester.tap(find.byKey(const Key('bottom-nav-tv')));
+      await tester.pump();
+      await tester.pump(const Duration(seconds: 1));
+
+      expect(find.byKey(const Key('live-tv-screen')), findsOneWidget);
+
+      await tester.tap(find.byKey(const Key('bottom-nav-home')));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 500));
+
+      expect(find.byKey(const Key('home-screen')), findsOneWidget);
+    });
+
+    testWidgets('does not overflow on narrow screen', (
+      WidgetTester tester,
+    ) async {
+      tester.view.physicalSize = const Size(375, 812);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(() {
+        tester.view.resetPhysicalSize();
+        tester.view.resetDevicePixelRatio();
+      });
+
+      await tester.pumpWidget(
+        const MaterialApp(home: LiveTvScreen()),
+      );
+
+      expect(find.byKey(const Key('live-tv-screen')), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('category chips are interactive', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        const MaterialApp(home: LiveTvScreen()),
+      );
+
+      final todosText = tester.widget<Text>(find.text('Todos'));
+      expect(todosText.style?.fontWeight, FontWeight.w700);
+
+      await tester.tap(find.text('Esportes'));
+      await tester.pump();
+
+      final esportesText = tester.widget<Text>(find.text('Esportes'));
+      expect(esportesText.style?.fontWeight, FontWeight.w700);
+    });
+
+    testWidgets('Home bottom nav TV navigates to TV screen', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(const TelaflixApp());
+      await tester.pump(const Duration(seconds: 4));
+      await tester.pump();
+      await tester.pump(const Duration(seconds: 1));
+
+      await tester.tap(find.text('Entrar'));
+      await tester.pump();
+      await tester.pump(const Duration(seconds: 1));
+
+      expect(find.byKey(const Key('home-screen')), findsOneWidget);
+
+      await tester.tap(find.byKey(const Key('bottom-nav-tv')));
+      await tester.pump();
+      await tester.pump(const Duration(seconds: 1));
+
+      expect(find.byKey(const Key('live-tv-screen')), findsOneWidget);
+    });
+
+    testWidgets('MoviesScreen -> TV ao tocar bottom-nav-tv', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        const MaterialApp(home: MoviesScreen()),
+      );
+
+      expect(find.byKey(const Key('movies-screen')), findsOneWidget);
+
+      await tester.tap(find.byKey(const Key('bottom-nav-tv')));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 500));
+
+      expect(find.byKey(const Key('live-tv-screen')), findsOneWidget);
+    });
+
+    testWidgets('SeriesScreen -> TV ao tocar bottom-nav-tv', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        const MaterialApp(home: SeriesScreen()),
+      );
+
+      expect(find.byKey(const Key('series-screen')), findsOneWidget);
+
+      await tester.tap(find.byKey(const Key('bottom-nav-tv')));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 500));
+
+      expect(find.byKey(const Key('live-tv-screen')), findsOneWidget);
+    });
+
+    testWidgets('MoviesDetailScreen -> TV', (
+      WidgetTester tester,
+    ) async {
+      final detail = mockMoviesDetails['amanhecer-vermelho']!;
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: MoviesDetailScreen(detail: detail),
+        ),
+      );
+
+      expect(find.byKey(const Key('movies-detail-screen')), findsOneWidget);
+
+      await tester.tap(find.byKey(const Key('bottom-nav-tv')));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 500));
+
+      expect(find.byKey(const Key('live-tv-screen')), findsOneWidget);
+    });
+
+    testWidgets('SeriesDetailScreen -> TV', (
+      WidgetTester tester,
+    ) async {
+      final detail = mockSeriesDetails['codigo-das-sombras']!;
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: SeriesDetailScreen(detail: detail),
+        ),
+      );
+
+      expect(find.byKey(const Key('series-detail-screen')), findsOneWidget);
+
+      await tester.tap(find.byKey(const Key('bottom-nav-tv')));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 500));
+
+      expect(find.byKey(const Key('live-tv-screen')), findsOneWidget);
+    });
+
+    testWidgets('search bar renders with placeholder', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        const MaterialApp(home: LiveTvScreen()),
+      );
+
+      expect(find.byKey(const Key('live-tv-search-bar')), findsOneWidget);
+      expect(find.text('Buscar canais ou programas...'), findsOneWidget);
+    });
+
+    testWidgets('featured cards render horizontal list', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        const MaterialApp(home: LiveTvScreen()),
+      );
+
+      expect(find.byKey(const Key('live-tv-featured-list')), findsOneWidget);
+      expect(find.text('Globo'), findsOneWidget);
+      expect(find.text('ESPN Brasil'), findsWidgets);
+    });
+
+    testWidgets('LiveTvScreen -> MoviesScreen ao tocar bottom-nav-filmes', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        const MaterialApp(home: LiveTvScreen()),
+      );
+
+      expect(find.byKey(const Key('live-tv-screen')), findsOneWidget);
+
+      await tester.tap(find.byKey(const Key('bottom-nav-filmes')));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 500));
+
+      expect(find.byKey(const Key('movies-screen')), findsOneWidget);
+    });
+
+    testWidgets('LiveTvScreen -> SeriesScreen ao tocar bottom-nav-series', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        const MaterialApp(home: LiveTvScreen()),
+      );
+
+      expect(find.byKey(const Key('live-tv-screen')), findsOneWidget);
+
+      await tester.tap(find.byKey(const Key('bottom-nav-series')));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 500));
+
+      expect(find.byKey(const Key('series-screen')), findsOneWidget);
+    });
+
+    testWidgets('channel list renders channels', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        const MaterialApp(home: LiveTvScreen()),
+      );
+
+      await tester.scrollUntilVisible(
+        find.byKey(const Key('live-tv-channel-list')),
+        200,
+        scrollable: find.byType(Scrollable).first,
+      );
+      await tester.pump();
+
+      expect(find.byKey(const Key('live-tv-channel-list')), findsOneWidget);
+      expect(find.text('Renascer'), findsOneWidget);
+      expect(find.text('SportsCenter'), findsOneWidget);
     });
   });
 }

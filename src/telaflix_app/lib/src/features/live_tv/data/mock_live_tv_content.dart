@@ -1,0 +1,107 @@
+import '../domain/live_tv_content.dart';
+
+const mockLiveTvContent = LiveTvContent(
+  featured: [
+    FeaturedLiveTvItem(
+      id: 'globo',
+      title: 'Globo',
+      subtitle: 'Novela das 9',
+      metadata: 'Agora  |  Novela  |  Ao vivo',
+      colorValue: 0xFF2563EB,
+    ),
+    FeaturedLiveTvItem(
+      id: 'espn',
+      title: 'ESPN Brasil',
+      subtitle: 'Brasileirao Serie A',
+      metadata: 'Agora  |  Esporte  |  Ao vivo',
+      colorValue: 0xFFDC2626,
+    ),
+    FeaturedLiveTvItem(
+      id: 'telecine',
+      title: 'Telecine Premium',
+      subtitle: 'O Poderoso Chefao',
+      metadata: 'Agora  |  Filme  |  Ao vivo',
+      colorValue: 0xFFB45309,
+    ),
+  ],
+  categories: [
+    LiveTvCategoryItem(label: 'Todos', selected: true),
+    LiveTvCategoryItem(label: 'Abertos'),
+    LiveTvCategoryItem(label: 'Filmes'),
+    LiveTvCategoryItem(label: 'Esportes'),
+    LiveTvCategoryItem(label: 'Noticias'),
+    LiveTvCategoryItem(label: 'Kids'),
+  ],
+  channels: [
+    LiveTvChannelItem(
+      id: 'globo',
+      name: 'Globo',
+      currentProgram: 'Renascer',
+      category: 'Novela',
+      colorValue: 0xFF2563EB,
+    ),
+    LiveTvChannelItem(
+      id: 'sbt',
+      name: 'SBT',
+      currentProgram: 'Programa Silvio Santos',
+      category: 'Entretenimento',
+      colorValue: 0xFF7C3AED,
+    ),
+    LiveTvChannelItem(
+      id: 'record',
+      name: 'Record',
+      currentProgram: 'Jornal da Record',
+      category: 'Noticia',
+      colorValue: 0xFF15803D,
+    ),
+    LiveTvChannelItem(
+      id: 'band',
+      name: 'Band',
+      currentProgram: 'Jogo Aberto',
+      category: 'Esporte',
+      colorValue: 0xFFEA580C,
+    ),
+    LiveTvChannelItem(
+      id: 'espn',
+      name: 'ESPN Brasil',
+      currentProgram: 'SportsCenter',
+      category: 'Esporte',
+      colorValue: 0xFFDC2626,
+    ),
+    LiveTvChannelItem(
+      id: 'telecine-premium',
+      name: 'Telecine Premium',
+      currentProgram: 'Interestelar',
+      category: 'Filme',
+      colorValue: 0xFFB45309,
+    ),
+    LiveTvChannelItem(
+      id: 'cartoon',
+      name: 'Cartoon Network',
+      currentProgram: 'Hora de Aventura',
+      category: 'Kids',
+      colorValue: 0xFF0F766E,
+    ),
+    LiveTvChannelItem(
+      id: 'discovery',
+      name: 'Discovery',
+      currentProgram: 'Largados e Pelados',
+      category: 'Reality',
+      colorValue: 0xFF7C2D12,
+    ),
+    LiveTvChannelItem(
+      id: 'megapix',
+      name: 'Megapix',
+      currentProgram: 'Velozes e Furiosos 8',
+      category: 'Filme',
+      colorValue: 0xFF4B5563,
+    ),
+    LiveTvChannelItem(
+      id: 'gnt',
+      name: 'GNT',
+      currentProgram: 'Saia Justa',
+      category: 'Talk Show',
+      colorValue: 0xFFEA580C,
+    ),
+  ],
+);

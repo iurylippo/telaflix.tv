@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../live_tv/presentation/live_tv_screen.dart';
 import '../../movies/presentation/movies_screen.dart';
 import '../../series/presentation/series_screen.dart';
 import '../data/mock_home_content.dart';
@@ -45,6 +46,22 @@ class HomeScreen extends StatelessWidget {
               PageRouteBuilder<void>(
                 pageBuilder: (context, animation, secondaryAnimation) =>
                     const SeriesScreen(),
+                transitionsBuilder: (
+                  context,
+                  animation,
+                  secondaryAnimation,
+                  child,
+                ) {
+                  return FadeTransition(opacity: animation, child: child);
+                },
+              ),
+            );
+          }
+          if (index == 3) {
+            Navigator.of(context).push(
+              PageRouteBuilder<void>(
+                pageBuilder: (context, animation, secondaryAnimation) =>
+                    const LiveTvScreen(),
                 transitionsBuilder: (
                   context,
                   animation,

@@ -1,45 +1,29 @@
 import 'package:flutter/material.dart';
 
 import '../../home/presentation/widgets/home_bottom_nav.dart';
-import '../../live_tv/presentation/live_tv_screen.dart';
 import '../../movies/presentation/movies_screen.dart';
-import '../data/mock_series_content.dart';
-import 'series_detail_screen.dart';
-import 'widgets/featured_series_card.dart';
-import 'widgets/series_category_chips.dart';
-import 'widgets/series_poster_grid.dart';
-import 'widgets/series_search_bar.dart';
+import '../../series/presentation/series_screen.dart';
+import '../data/mock_live_tv_content.dart';
+import 'widgets/live_tv_category_chips.dart';
+import 'widgets/live_tv_channel_list.dart';
+import 'widgets/live_tv_featured_card.dart';
+import 'widgets/live_tv_search_bar.dart';
 
-class SeriesScreen extends StatelessWidget {
-  const SeriesScreen({super.key});
+class LiveTvScreen extends StatelessWidget {
+  const LiveTvScreen({super.key});
 
   static const _bottomNavKey = Key('bottom-nav');
 
-  void _openDetail(BuildContext context, String seriesId) {
-    final detail = mockSeriesDetails[seriesId];
-    if (detail == null) return;
-
-    Navigator.of(context).push(
-      PageRouteBuilder<void>(
-        pageBuilder: (context, animation, secondaryAnimation) =>
-            SeriesDetailScreen(detail: detail),
-        transitionsBuilder: (context, animation, secondaryAnimation, child) {
-          return FadeTransition(opacity: animation, child: child);
-        },
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
-    final content = mockSeriesContent;
+    final content = mockLiveTvContent;
 
     return Scaffold(
-      key: const Key('series-screen'),
+      key: const Key('live-tv-screen'),
       backgroundColor: const Color(0xFF09090D),
       bottomNavigationBar: HomeBottomNav(
         key: _bottomNavKey,
-        selectedIndex: 2,
+        selectedIndex: 3,
         onItemSelected: (index) {
           if (index == 0) {
             Navigator.of(context).popUntil((route) => route.isFirst);
@@ -60,11 +44,11 @@ class SeriesScreen extends StatelessWidget {
               ),
             );
           }
-          if (index == 3) {
+          if (index == 2) {
             Navigator.of(context).push(
               PageRouteBuilder<void>(
                 pageBuilder: (context, animation, secondaryAnimation) =>
-                    const LiveTvScreen(),
+                    const SeriesScreen(),
                 transitionsBuilder: (
                   context,
                   animation,
@@ -86,35 +70,38 @@ class SeriesScreen extends StatelessWidget {
               padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
               sliver: SliverList.list(
                 children: [
-                  const SeriesSearchBar(),
+                  Text(
+                    'TV Ao Vivo',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 22,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  const LiveTvSearchBar(),
                   const SizedBox(height: 24),
-                  const _SectionTitle(title: 'Series em Destaque'),
+                  const _SectionTitle(title: 'Destaques'),
                   const SizedBox(height: 14),
                   SizedBox(
                     height: 220,
                     child: ListView.separated(
+                      key: const Key('live-tv-featured-list'),
                       scrollDirection: Axis.horizontal,
                       itemCount: content.featured.length,
                       separatorBuilder: (_, _) => const SizedBox(width: 14),
                       itemBuilder: (context, index) {
                         final item = content.featured[index];
-                        return FeaturedSeriesCard(
-                          item: item,
-                          onTap: () => _openDetail(context, item.id),
-                        );
+                        return LiveTvFeaturedCard(item: item);
                       },
                     ),
                   ),
                   const SizedBox(height: 28),
-                  SeriesCategoryChips(categories: content.categories),
+                  LiveTvCategoryChips(categories: content.categories),
                   const SizedBox(height: 28),
-                  const _SectionTitle(title: 'Explorar Series'),
+                  const _SectionTitle(title: 'Canais'),
                   const SizedBox(height: 14),
-                  SeriesPosterGrid(
-                    posters: content.posters,
-                    onPosterSelected: (item) =>
-                        _openDetail(context, item.id),
-                  ),
+                  LiveTvChannelList(channels: content.channels),
                   const SizedBox(height: 16),
                 ],
               ),

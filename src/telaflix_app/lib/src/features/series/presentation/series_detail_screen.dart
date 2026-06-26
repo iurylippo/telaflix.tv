@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../home/presentation/widgets/home_bottom_nav.dart';
+import '../../live_tv/presentation/live_tv_screen.dart';
 import '../../movies/presentation/movies_screen.dart';
 import '../domain/series_content.dart';
 import 'widgets/series_cast_section.dart';
@@ -42,6 +43,24 @@ class _SeriesDetailScreenState extends State<SeriesDetailScreen> {
               PageRouteBuilder<void>(
                 pageBuilder: (context, animation, secondaryAnimation) =>
                     const MoviesScreen(),
+                transitionsBuilder: (
+                  context,
+                  animation,
+                  secondaryAnimation,
+                  child,
+                ) {
+                  return FadeTransition(opacity: animation, child: child);
+                },
+              ),
+            );
+          }
+          if (index == 3) {
+            Navigator.of(context)
+                .popUntil((route) => route.isFirst);
+            Navigator.of(context).push(
+              PageRouteBuilder<void>(
+                pageBuilder: (context, animation, secondaryAnimation) =>
+                    const LiveTvScreen(),
                 transitionsBuilder: (
                   context,
                   animation,
