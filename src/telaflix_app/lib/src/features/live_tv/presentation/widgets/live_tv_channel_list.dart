@@ -4,9 +4,14 @@ import '../../domain/live_tv_content.dart';
 import 'live_tv_channel_tile.dart';
 
 class LiveTvChannelList extends StatelessWidget {
-  const LiveTvChannelList({super.key, required this.channels});
+  const LiveTvChannelList({
+    super.key,
+    required this.channels,
+    this.onChannelSelected,
+  });
 
   final List<LiveTvChannelItem> channels;
+  final ValueChanged<LiveTvChannelItem>? onChannelSelected;
 
   @override
   Widget build(BuildContext context) {
@@ -14,7 +19,11 @@ class LiveTvChannelList extends StatelessWidget {
       key: const Key('live-tv-channel-list'),
       children: [
         for (final channel in channels) ...[
-          LiveTvChannelTile(channel: channel),
+          LiveTvChannelTile(
+            channel: channel,
+            onTap:
+                onChannelSelected != null ? () => onChannelSelected!(channel) : null,
+          ),
           const SizedBox(height: 10),
         ],
       ],

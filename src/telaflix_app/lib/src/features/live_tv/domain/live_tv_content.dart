@@ -53,3 +53,41 @@ class LiveTvChannelItem {
   final int colorValue;
   final bool live;
 }
+
+class LiveTvProgramItem {
+  const LiveTvProgramItem({
+    required this.startTime,
+    required this.endTime,
+    required this.title,
+    required this.description,
+    this.isCurrent = false,
+  });
+
+  final String startTime;
+  final String endTime;
+  final String title;
+  final String description;
+  final bool isCurrent;
+}
+
+class LiveTvChannelDetail {
+  const LiveTvChannelDetail({
+    required this.id,
+    required this.name,
+    required this.streamUrl,
+    required this.currentProgram,
+    required this.category,
+    required this.description,
+    required this.colorValue,
+    required this.schedule,
+  });
+
+  final String id;
+  final String name;
+  final String streamUrl;
+  final String currentProgram;
+  final String category;
+  final String description;
+  final int colorValue;
+  final List<LiveTvProgramItem> schedule;
+}

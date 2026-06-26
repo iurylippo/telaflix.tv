@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:telaflix_app/src/app/app.dart';
+import 'package:telaflix_app/src/features/live_tv/data/mock_live_tv_content.dart';
+import 'package:telaflix_app/src/features/live_tv/presentation/live_tv_detail_screen.dart';
 import 'package:telaflix_app/src/features/live_tv/presentation/live_tv_screen.dart';
 import 'package:telaflix_app/src/features/movies/data/mock_movies_content.dart';
 import 'package:telaflix_app/src/features/movies/presentation/movies_detail_screen.dart';
@@ -1130,6 +1132,322 @@ void main() {
       expect(find.byKey(const Key('live-tv-channel-list')), findsOneWidget);
       expect(find.text('Renascer'), findsOneWidget);
       expect(find.text('SportsCenter'), findsOneWidget);
+    });
+
+    testWidgets('tapping featured card navigates to detail screen', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        const MaterialApp(home: LiveTvScreen()),
+      );
+
+      await tester.tap(find.text('Globo').first);
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 500));
+
+      expect(find.byKey(const Key('live-tv-detail-screen')), findsOneWidget);
+      expect(find.byKey(const Key('live-tv-player')), findsOneWidget);
+      expect(find.text('Globo'), findsWidgets);
+      expect(find.text('Renascer'), findsWidgets);
+    });
+
+    testWidgets('tapping channel tile navigates to detail screen', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        const MaterialApp(home: LiveTvScreen()),
+      );
+
+      await tester.scrollUntilVisible(
+        find.byKey(const Key('live-tv-channel-globo')),
+        200,
+        scrollable: find.byType(Scrollable).first,
+      );
+      await tester.pump();
+
+      await tester.tap(find.byKey(const Key('live-tv-channel-globo')));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 500));
+
+      expect(find.byKey(const Key('live-tv-detail-screen')), findsOneWidget);
+      expect(find.byKey(const Key('live-tv-player')), findsOneWidget);
+      expect(find.text('Globo'), findsWidgets);
+    });
+
+    testWidgets('telecine-premium featured card resolves to detail', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        const MaterialApp(home: LiveTvScreen()),
+      );
+
+      await tester.tap(find.text('Telecine Premium').first);
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 500));
+
+      expect(find.byKey(const Key('live-tv-detail-screen')), findsOneWidget);
+      expect(find.text('Interestelar'), findsWidgets);
+    });
+
+    testWidgets('detail screen shows player and fullscreen button', (
+      WidgetTester tester,
+    ) async {
+      tester.view.physicalSize = const Size(390, 812);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(() {
+        tester.view.resetPhysicalSize();
+        tester.view.resetDevicePixelRatio();
+      });
+
+      final detail = mockLiveTvDetails['globo']!;
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: LiveTvDetailScreen(
+            detail: detail,
+            playerControllerFactory: null,
+          ),
+        ),
+      );
+
+      expect(find.byKey(const Key('live-tv-detail-screen')), findsOneWidget);
+      expect(find.byKey(const Key('live-tv-player')), findsOneWidget);
+      expect(find.byKey(const Key('live-tv-fullscreen-button')), findsOneWidget);
+    });
+
+    testWidgets('detail screen shows channel metadata', (
+      WidgetTester tester,
+    ) async {
+      tester.view.physicalSize = const Size(390, 812);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(() {
+        tester.view.resetPhysicalSize();
+        tester.view.resetDevicePixelRatio();
+      });
+
+      final detail = mockLiveTvDetails['globo']!;
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: LiveTvDetailScreen(
+            detail: detail,
+            playerControllerFactory: null,
+          ),
+        ),
+      );
+
+      expect(find.text('Globo'), findsWidgets);
+      expect(find.text('Renascer'), findsWidgets);
+      expect(find.text('Novela'), findsOneWidget);
+      expect(find.text('AO VIVO'), findsWidgets);
+    });
+
+    testWidgets('detail screen shows programming section with current program', (
+      WidgetTester tester,
+    ) async {
+      tester.view.physicalSize = const Size(390, 1200);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(() {
+        tester.view.resetPhysicalSize();
+        tester.view.resetDevicePixelRatio();
+      });
+
+      final detail = mockLiveTvDetails['globo']!;
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: LiveTvDetailScreen(
+            detail: detail,
+            playerControllerFactory: null,
+          ),
+        ),
+      );
+
+      await tester.scrollUntilVisible(
+        find.byKey(const Key('live-tv-programming-section')),
+        300,
+        scrollable: find.byType(Scrollable).first,
+      );
+      await tester.pump();
+
+      expect(find.byKey(const Key('live-tv-programming-section')), findsOneWidget);
+      expect(find.byKey(const Key('live-tv-current-program')), findsOneWidget);
+      expect(find.text('Programacao'), findsOneWidget);
+      expect(find.text('21:00'), findsOneWidget);
+      expect(find.text('Jornal Nacional'), findsOneWidget);
+      expect(find.text('BBB 25'), findsOneWidget);
+    });
+
+    testWidgets('programming section highlights current program', (
+      WidgetTester tester,
+    ) async {
+      tester.view.physicalSize = const Size(390, 1200);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(() {
+        tester.view.resetPhysicalSize();
+        tester.view.resetDevicePixelRatio();
+      });
+
+      final detail = mockLiveTvDetails['globo']!;
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: LiveTvDetailScreen(
+            detail: detail,
+            playerControllerFactory: null,
+          ),
+        ),
+      );
+
+      await tester.scrollUntilVisible(
+        find.byKey(const Key('live-tv-current-program')),
+        300,
+        scrollable: find.byType(Scrollable).first,
+      );
+      await tester.pump();
+
+      expect(find.byKey(const Key('live-tv-current-program')), findsOneWidget);
+
+      final currentProgramRow = find.descendant(
+        of: find.byKey(const Key('live-tv-current-program')),
+        matching: find.byType(Container),
+      ).first;
+      final container = tester.widget<Container>(currentProgramRow);
+      final decoration = container.decoration as BoxDecoration;
+      expect(decoration.color, const Color(0xFF1A1A24));
+    });
+
+    testWidgets('back button returns to live tv screen', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        const MaterialApp(home: LiveTvScreen()),
+      );
+
+      await tester.tap(find.text('Globo').first);
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 500));
+
+      expect(find.byKey(const Key('live-tv-detail-screen')), findsOneWidget);
+
+      await tester.tap(find.byKey(const Key('detail-back-button')));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 500));
+
+      expect(find.byKey(const Key('live-tv-detail-screen')), findsNothing);
+      expect(find.byKey(const Key('live-tv-screen')), findsOneWidget);
+    });
+
+    testWidgets('detail bottom nav has TV active', (
+      WidgetTester tester,
+    ) async {
+      tester.view.physicalSize = const Size(390, 812);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(() {
+        tester.view.resetPhysicalSize();
+        tester.view.resetDevicePixelRatio();
+      });
+
+      final detail = mockLiveTvDetails['globo']!;
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: LiveTvDetailScreen(
+            detail: detail,
+            playerControllerFactory: null,
+          ),
+        ),
+      );
+
+      expect(find.byKey(const Key('bottom-nav-tv')), findsOneWidget);
+
+      final tvNavText = tester.widget<Text>(find.text('TV').last);
+      expect(tvNavText.style?.fontWeight, FontWeight.w700);
+    });
+
+    testWidgets('detail does not overflow on narrow screen', (
+      WidgetTester tester,
+    ) async {
+      tester.view.physicalSize = const Size(375, 812);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(() {
+        tester.view.resetPhysicalSize();
+        tester.view.resetDevicePixelRatio();
+      });
+
+      final detail = mockLiveTvDetails['globo']!;
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: LiveTvDetailScreen(
+            detail: detail,
+            playerControllerFactory: null,
+          ),
+        ),
+      );
+
+      expect(find.byKey(const Key('live-tv-detail-screen')), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('LiveTvDetailScreen -> MoviesScreen via bottom nav', (
+      WidgetTester tester,
+    ) async {
+      tester.view.physicalSize = const Size(390, 812);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(() {
+        tester.view.resetPhysicalSize();
+        tester.view.resetDevicePixelRatio();
+      });
+
+      final detail = mockLiveTvDetails['globo']!;
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: LiveTvDetailScreen(
+            detail: detail,
+            playerControllerFactory: null,
+          ),
+        ),
+      );
+
+      expect(find.byKey(const Key('live-tv-detail-screen')), findsOneWidget);
+
+      await tester.tap(find.byKey(const Key('bottom-nav-filmes')));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 500));
+
+      expect(find.byKey(const Key('movies-screen')), findsOneWidget);
+    });
+
+    testWidgets('LiveTvDetailScreen -> SeriesScreen via bottom nav', (
+      WidgetTester tester,
+    ) async {
+      tester.view.physicalSize = const Size(390, 812);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(() {
+        tester.view.resetPhysicalSize();
+        tester.view.resetDevicePixelRatio();
+      });
+
+      final detail = mockLiveTvDetails['globo']!;
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: LiveTvDetailScreen(
+            detail: detail,
+            playerControllerFactory: null,
+          ),
+        ),
+      );
+
+      expect(find.byKey(const Key('live-tv-detail-screen')), findsOneWidget);
+
+      await tester.tap(find.byKey(const Key('bottom-nav-series')));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 500));
+
+      expect(find.byKey(const Key('series-screen')), findsOneWidget);
     });
   });
 }
